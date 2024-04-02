@@ -1,3 +1,3 @@
-# OpenGLRender  Ê¹ÓÃOpenGL³¡¾°äÖÈ¾
+ï»¿# OpenGLRender  ä½¿ç”¨OpenGLåœºæ™¯æ¸²æŸ“
 
-# Lesson01-glfw   ½¨Á¢OpenGL´°¿Ú
+# Lesson01-glfw   å»ºç«‹OpenGLçª—å£
