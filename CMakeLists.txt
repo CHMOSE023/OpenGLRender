@@ -7,12 +7,15 @@ link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/deps/lib")      # 连接器搜�
 
 set( SRCES
 	"Lesson01-glfw" # 01-使用 glfw 建立OpenGL窗口
+	"Lesson02-App" # 01-使用 glfw 建立OpenGL窗口
 )
 
-foreach(Src ${SRCES} )		
+set(GLAD "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c")
+
+foreach(Src ${SRCES} )	
 
     message(${Src})
-    file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.cpp" )
+    file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.cpp" ${GLAD})
     add_executable (${Src}  ${SrcFile} )
     target_link_libraries(${Src} glfw3 openGL32  )
 endforeach()
