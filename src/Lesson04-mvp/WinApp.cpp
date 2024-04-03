@@ -3,10 +3,15 @@
 #include <stdlib.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <math.h>
 
 
-WinApp::WinApp():m_pWindow(nullptr),m_Width(0),m_Height(0), m_VertexArray(0), m_Texture(0)
-{	
+WinApp::WinApp() :m_pWindow(nullptr), m_Width(0), m_Height(0), m_VertexArray(0)
+{
+	 m_VertexArray  = -1;
+	 m_Grounds      = -1;
+	 m_TextureCity  = -1;
+	 m_TextureGrass = -1;
 }
 
 WinApp::~WinApp()
@@ -18,6 +23,7 @@ WinApp::~WinApp()
 
 void WinApp::ErrorCallback(int error, const char* description)
 {
+
 }
 
 void WinApp::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -52,18 +58,21 @@ void WinApp::Initialize(int width, int height,const char*title)
 	// 初始化 shader
 	m_Shader.Initialize();
 	// 加载纹理
-	LoadTexture("textures/chongqing.jpg");
-
+	m_TextureCity  = LoadTexture("textures/chongqing.jpg");
+	m_TextureGrass = LoadTexture("textures/grass.jpg");
+	// 启动深度缓冲
+	glEnable(GL_DEPTH_TEST);
+	
 	static const Vertex vertices[6] =
 	{
 		 //       顶点                    颜色                UV                
-		{ { -1.0f,-1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,0.0f } },
-		{ {  1.0f,-1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,0.0f } },
-		{ {  1.0f, 1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,1.0f }},
+		{ { -1.0f,-1.0f, 5.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,0.0f } },
+		{ {  1.0f,-1.0f, 5.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,0.0f } },
+		{ {  1.0f, 1.0f, 5.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,1.0f }},
 
-		{ { -1.0f,-1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,0.0f } },
-		{ {  1.0f, 1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,1.0f } },
-	    { { -1.0f, 1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,1.0f } }
+		{ { -1.0f,-1.0f, 5.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,0.0f } },
+		{ {  1.0f, 1.0f, 5.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,1.0f } },
+	    { { -1.0f, 1.0f, 5.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,1.0f } }
 
 	};
 
@@ -86,34 +95,18 @@ void WinApp::Initialize(int width, int height,const char*title)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	// 绘制地面数据
-	float   gSize = 100.0f;
-	float   gPos = -5.0f;
-	float   rept = 100.0f;
-
-	//static const Vertex grounds[6]
-	//{
-	//	//       顶点                    颜色                UV                
-	//   { { -gSize, gPos, -gSize }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,0.0f } },
-	//   { {  gSize, gPos, -gSize }, { 1.f, 1.f, 1.f,1.0f },{  rept,0.0f } },
-	//   { {  gSize, gPos,  gSize }, { 1.f, 1.f, 1.f,1.0f },{  rept,rept }},
-	//	  		   
-	//   { { -gSize, gPos, -gSize }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,0.0f } },
-	//   { {  gSize, gPos,  gSize }, { 1.f, 1.f, 1.f,1.0f },{  rept,rept } },
-	//   { { -gSize, gPos,  gSize }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,rept } },
-	//};
-
+	// 绘制地面数据	
 	static const Vertex grounds[6] =
 	{
 		//       顶点                    颜色                UV                
-	   { { -1.0f,-1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,0.0f } },
-	   { {  1.0f,-1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,0.0f } },
-	   { {  1.0f, 1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,1.0f }},
-
-	   { { -1.0f,-1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,0.0f } },
-	   { {  1.0f, 1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  1.0f,1.0f } },
-	   { { -1.0f, 1.0f, 1.0f }, { 1.f, 1.f, 1.f,1.0f },{  0.0f,1.0f } }
-
+	   { { -1.5f,-1.5f, 0.0f }, { 1.f, 1.f, 1.f,1.0f },{   0.0f, 0.0f } },
+	   { {  1.5f,-1.5f, 0.0f }, { 1.f, 1.f, 1.f,1.0f },{  10.0f, 0.0f } },
+	   { {  1.5f, 1.5f, 0.0f }, { 1.f, 1.f, 1.f,1.0f },{  10.0f,10.0f }},
+	
+	   { { -1.5f,-1.5f, 0.0f }, { 1.f, 1.f, 1.f,1.0f },{   0.0f, 0.0f } },
+	   { {  1.5f, 1.5f, 0.0f }, { 1.f, 1.f, 1.f,1.0f },{  10.0f,10.0f } },
+	   { { -1.5f, 1.5f, 0.0f }, { 1.f, 1.f, 1.f,1.0f },{   0.0f,10.0f } }
+	
 	};
 
 
@@ -143,8 +136,9 @@ void WinApp::Run()
 	{
 		glfwGetFramebufferSize(m_pWindow, &m_Width, &m_Height);
 		glViewport(0, 0, m_Width, m_Height);
-
-		glClear(GL_COLOR_BUFFER_BIT);
+		
+		glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+		
 		glClearColor(0.1f, 0.3f, 0.3f, 1.0f);
 
 		Render();
@@ -156,45 +150,53 @@ void WinApp::Run()
 
 void WinApp::Render()
 {
+	const float PI = 3.1415926;
 	const float ratio = m_Width / (float)m_Height;
 	mat4x4 m, p, mvp;
-	mat4x4_identity(m);
-	//mat4x4_scale(m, m, 2);	
-	mat4x4_translate(m, 1, 0, 0);
-	mat4x4_scale_aniso(m, m, 0.5, 1, 1);
-	//mat4x4_rotate_Z(m, m, (float)glfwGetTime());
-	//mat4x4_perspective(p, 45.0f, ratio, -2.f, 100.0f);
-	mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+	mat4x4_identity(m);	
+	// ！模型向后移动才能看到
+	mat4x4_translate(m, 0, 0,-3.0f);
+	
+	mat4x4_rotate_Y(m, m, (float)glfwGetTime());
+    mat4x4_rotate_Y(m, m, (float)glfwGetTime());
+	mat4x4_rotate_Z(m, m, (float)glfwGetTime());
+	// 透视投影
+	mat4x4_perspective(p, 45, ratio, 0.1f, 100.0f);	
 	mat4x4_mul(mvp, p, m);
 
 	// 使用shader
 	m_Shader.Begin();
 
+
+	// 使用纹理1 绘制旋转物体
+	glBindTexture(GL_TEXTURE_2D, m_TextureCity); 
 	glBindVertexArray(m_VertexArray);
 	glUniformMatrix4fv(m_Shader.m_MVP, 1, GL_FALSE, (const GLfloat*)&mvp);	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	mat4x4_identity(m);
-		
-	mat4x4_translate(m, -1, 0, 0);
-	mat4x4_scale_aniso(m, m, 0.5, 1, 1);	
-	mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+
+	// 使用纹理2 绘制地面
+	mat4x4_identity(m);		
+	mat4x4_translate(m, 0, -6.0, -12.0f);
+	mat4x4_scale_aniso(m, m, 30, 30, 1);
+	mat4x4_rotate_X(m, m, PI *.5);
+	mat4x4_perspective(p, 45, ratio, 0.1f, 100.0f);
 	mat4x4_mul(mvp, p, m);
 
+	glBindTexture(GL_TEXTURE_2D, m_TextureGrass);// 使用纹理2
 	glBindVertexArray(m_Grounds);
 	glUniformMatrix4fv(m_Shader.m_MVP, 1, GL_FALSE, (const GLfloat*)&mvp);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-
-	m_Shader.End();
-	
+	m_Shader.End();	
 }
 
-void WinApp::LoadTexture(const char* fileName)
+GLuint WinApp::LoadTexture(const char* fileName)
 {
-	//unsigned int texture;
-	glGenTextures(1, &m_Texture);
-	glBindTexture(GL_TEXTURE_2D, m_Texture);
+	
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture); 
 
 	// 为当前绑定的纹理对象设置环绕、过滤方式
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -217,7 +219,7 @@ void WinApp::LoadTexture(const char* fileName)
 		printf("加载失败\n");
 	}
 	stbi_image_free(data);
-
-
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return texture;
 }
 

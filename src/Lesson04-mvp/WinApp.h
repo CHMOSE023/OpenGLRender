@@ -24,7 +24,7 @@ public:
 	void Initialize(int width, int height, const char* title);  // Èë¿Úº¯Êý
 	void Run();
 	void Render();
-	void LoadTexture(const char* fileName);
+	GLuint LoadTexture(const char* fileName);
 	
 public:
 	int           m_Width;
@@ -33,7 +33,8 @@ public:
 	Shaders       m_Shader;
 	GLuint        m_VertexArray;
 	GLuint        m_Grounds;
-	GLuint        m_Texture;
+	GLuint        m_TextureCity;
+	GLuint        m_TextureGrass;
 
 };
 
