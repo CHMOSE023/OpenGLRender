@@ -20,7 +20,7 @@ public:
 	virtual bool  Initialize()
 	{
        const char* vs = R"(
-               #version 3301
+               #version 330
                uniform   mat4   MVP;
                layout(location = 0)  in vec3   aPos;
                layout(location = 1)  in vec4   aColor;
