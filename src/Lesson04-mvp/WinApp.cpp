@@ -157,8 +157,8 @@ void WinApp::Render()
 	// ！模型向后移动才能看到
 	mat4x4_translate(m, 0, 0,-3.0f);
 	
-	mat4x4_rotate_Y(m, m, (float)glfwGetTime());
-    mat4x4_rotate_Y(m, m, (float)glfwGetTime());
+	mat4x4_rotate_Y(m, m, (float)glfwGetTime()*.5);
+     mat4x4_rotate_X(m, m, (float)glfwGetTime());
 	mat4x4_rotate_Z(m, m, (float)glfwGetTime());
 	// 透视投影
 	mat4x4_perspective(p, 45, ratio, 0.1f, 100.0f);	
