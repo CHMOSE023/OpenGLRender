@@ -4,13 +4,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <math.h>
+#include <Windows.h>
 
 WinApp::WinApp() :m_pWindow(nullptr), m_Width(0), m_Height(0), m_VertexArray(0)
 {
-	 m_VertexArray  = -1;
-	 m_Grounds      = -1;
-	 m_TextureCity  = -1;
-	 m_TextureGrass = -1;
+	 m_VertexArray   = -1;
+	 m_Grounds       = -1;
+	 m_TextureCity   = -1;
+	 m_TextureGrass  = -1;	
+	 m_LastFrameTime = -1;
 }
 
 WinApp::~WinApp()
@@ -24,25 +26,32 @@ void WinApp::ErrorCallback(int error, const char* description)
 {
 
 }
+
 // 键盘消息
 void WinApp::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-  //	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-  //		glfwSetWindowShouldClose(window, GLFW_TRUE); // 关闭窗口
-
-	printf("Key:\t%d,%d,%d,%d\n", key, scancode, action, mods);
-
+{	
+	//WinApp* winApp = GetWindow(window);
+	//printf("%p\r", winApp);	
+	//printf("Key:\t%d,%d,%d,%d\r", key, scancode, action, mods);	
 }
 
 void WinApp::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	printf("Mouse:\t%d,%d,%d\n", button, action, mods);
+	//printf("Mouse:\t%d,%d,%d\n", button, action, mods);
 }
 
 void WinApp::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	printf("CursorPosition:\txpos %0.3f,ypos %0.3f\n", xpos, ypos);
+	//printf("CursorPosition:\txpos %0.3f,ypos %0.3f\n", xpos, ypos);
 }
+
+// 获取 glfw 窗口的用户数据，转换成 WinApp类指针。
+WinApp* WinApp::GetWindow(GLFWwindow* window)
+{
+	void* userdata = glfwGetWindowUserPointer(window);
+	return reinterpret_cast<WinApp*>(userdata);
+}
+
 
 void WinApp::Initialize(int width, int height,const char*title)
 {
@@ -62,13 +71,18 @@ void WinApp::Initialize(int width, int height,const char*title)
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-
+		
 	// 设置glfw回调函数
 	glfwSetKeyCallback(m_pWindow, KeyCallback);
 	glfwSetMouseButtonCallback(m_pWindow, MouseButtonCallback);
 	glfwSetCursorPosCallback(m_pWindow, CursorPositionCallback);
+	//glfwSetFramebufferSizeCallback(m_pWindow, FramebufferSizeCallback);
 
 	glfwMakeContextCurrent(m_pWindow);
+
+	// 设置用户数据，记录当前类指针
+	glfwSetWindowUserPointer(m_pWindow, this);
+
 	gladLoadGL();
 	glfwSwapInterval(1);
 
@@ -77,6 +91,17 @@ void WinApp::Initialize(int width, int height,const char*title)
 	// 加载纹理
 	m_TextureCity  = LoadTexture("textures/chongqing.jpg");
 	m_TextureGrass = LoadTexture("textures/grass.jpg");
+		
+
+	// 初始化相机
+	m_FirstCamera.m_Eye   = glm::vec3(0.0f, 0.0f, 0.2f); // 摄像机位置
+	m_FirstCamera.m_Look  = glm::vec3(0.0f, 0.0f, 0.0f); // 观察目标位置
+	m_FirstCamera.m_Up    = glm::vec3(0.0f, 1.0f, 0.0f); // 上方向向量
+	m_FirstCamera.m_Right = glm::vec3(1.0f, 0.0f, 0.0f);
+
+	// 记录上一帧的时间
+	m_LastFrameTime = glfwGetTime();
+	
 	// 启动深度缓冲
 	glEnable(GL_DEPTH_TEST);
 	
@@ -148,8 +173,7 @@ void WinApp::Initialize(int width, int height,const char*title)
 
 #include <string>
 void WinApp::Run()
-{	
-	
+{		
 	while (!glfwWindowShouldClose(m_pWindow))
 	{
 		glfwGetFramebufferSize(m_pWindow, &m_Width, &m_Height);
@@ -166,25 +190,31 @@ void WinApp::Run()
 	}
 }
 
+
 void WinApp::Render()
 {
+	
+	double currentFrameTime = glfwGetTime();                // 获取当前帧的时间
+	double deltaTime = currentFrameTime - m_LastFrameTime; 	// 计算帧间隔
+	m_FirstCamera.UpdateCamera(deltaTime);                  // 更新相机
+	m_LastFrameTime = currentFrameTime;                     // 更新上一帧时间
+
 	const float PI = 3.1415926;
 	const float ratio = m_Width / (float)m_Height;
-	mat4x4 m, p, mvp;
-	mat4x4_identity(m);	
-	// ！模型向后移动才能看到
-	mat4x4_translate(m, 0, 0,-3.0f);
-	
-	mat4x4_rotate_Y(m, m, (float)glfwGetTime()*.5);
-     mat4x4_rotate_X(m, m, (float)glfwGetTime());
-	mat4x4_rotate_Z(m, m, (float)glfwGetTime());
-	// 透视投影
-	mat4x4_perspective(p, 45, ratio, 0.1f, 100.0f);	
-	mat4x4_mul(mvp, p, m);
+	float angle = glfwGetTime();
+
+	glm::mat4  world, proj, mvp;
+	glm::mat4  viewMatrix = glm::lookAt(m_FirstCamera.m_Eye, m_FirstCamera.m_Look, m_FirstCamera.m_Up);
+
+	glm::vec3 axis(1.0f, 1.0f, 1.0f);                                   // 绕 x y z轴旋转
+	proj  = glm::perspective(glm::radians(45.0f), ratio, 0.1f, 100.0f); // 透视投影
+	world = glm::mat4x4(1.0);	                                        // 1
+	world = glm::translate(world, glm::vec3(0, 0, -3.0f));	            // ！模型向后移动才能看到	
+	world = glm::rotate(world, angle, axis);;		
+	mvp = proj * viewMatrix *world;
 
 	// 使用shader
 	m_Shader.Begin();
-
 
 	// 使用纹理1 绘制旋转物体
 	glBindTexture(GL_TEXTURE_2D, m_TextureCity); 
@@ -192,15 +222,12 @@ void WinApp::Render()
 	glUniformMatrix4fv(m_Shader.m_MVP, 1, GL_FALSE, (const GLfloat*)&mvp);	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-
+	world = glm::mat4x4(1.0);
+	world = glm::translate(world, glm::vec3(0, -4.5f, -12.0f));
+	world = glm::scale(world,glm::vec3(30.0f, 30.0f, 1.0f));
+	world = glm::rotate(world, PI*0.5f, glm::vec3(1.0f, 0.0f, 0.0f));
+	mvp   = proj * viewMatrix * world;
 	// 使用纹理2 绘制地面
-	mat4x4_identity(m);		
-	mat4x4_translate(m, 0, -6.0, -12.0f);
-	mat4x4_scale_aniso(m, m, 30, 30, 1);
-	mat4x4_rotate_X(m, m, PI *.5);
-	mat4x4_perspective(p, 45, ratio, 0.1f, 100.0f);
-	mat4x4_mul(mvp, p, m);
-
 	glBindTexture(GL_TEXTURE_2D, m_TextureGrass);// 使用纹理2
 	glBindVertexArray(m_Grounds);
 	glUniformMatrix4fv(m_Shader.m_MVP, 1, GL_FALSE, (const GLfloat*)&mvp);

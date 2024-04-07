@@ -2,7 +2,7 @@
 #include "Shader_P3_C4_T2.h"
 #include <GLFW/glfw3.h>
 #include "linmath.h"
-
+#include "FirstCamera.h"
 
 typedef struct Vertex
 {
@@ -23,6 +23,7 @@ public:
 	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 	static void CursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
+	static WinApp* GetWindow(GLFWwindow* window);
 	void Initialize(int width, int height, const char* title);  // 入口函数
 	void Run();
 	void Render();
@@ -37,6 +38,10 @@ public:
 	GLuint        m_Grounds;
 	GLuint        m_TextureCity;
 	GLuint        m_TextureGrass;
+	FirstCamera   m_FirstCamera;
+	float         m_LastFrameTime;// 记录上一帧的时间
+		
+	
 
 };
 
