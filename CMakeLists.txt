@@ -10,7 +10,8 @@ set( SRCES
 	"Lesson02-App"       # 02-封装窗口
     "Lesson03-texture2D" # 03-使用2D纹理
     "Lesson04-mvp"       # 04-矩阵：模型M、观察V、投影P 
-    "Lesson05-camera"    # 05-摄像机 
+    "Lesson05-camera"    # 05-摄像机 第一人称
+    "Lesson06-camera3rd" # 06-摄像机 第三人称 
 )
 
 set(GLAD "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c")
@@ -22,7 +23,7 @@ file(COPY ${Textures} DESTINATION textures/)
 
 foreach(Src ${SRCES} )	
     message(${Src})
-    file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.cpp" ${GLAD})
+    file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.hpp"  "src/${Src}/*.cpp"${GLAD})
     add_executable (${Src}  ${SrcFile} )
     target_link_libraries(${Src} glfw3 openGL32  )
 endforeach()
