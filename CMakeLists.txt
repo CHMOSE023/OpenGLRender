@@ -15,6 +15,7 @@ set( SRCES
     "Lesson05-camera"       # 05-摄像机 第一人称
     "Lesson06-camera3rd"    # 06-摄像机 第三人称 
     "Lesson07-VertexBuffer" # 07-顶点缓冲区 
+    "Lesson08-FrameBuffer"  # 08-帧缓冲 
 )
 
 set(GLAD "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c")
