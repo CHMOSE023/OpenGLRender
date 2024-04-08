@@ -138,20 +138,20 @@ void WinApp::Render()   // ！渲染
 
 	{	// 计算mvp	
 		// 相机参数
-		glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+		glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 2.0f);
 		glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -100.0f);
 		glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 		// 设置模型矩阵
 		glm::mat4 model = glm::mat4(1.0f); // 初始化为单位矩阵
-		model = glm::translate(model, glm::vec3(0, 0, -3));
+		//model = glm::translate(model, glm::vec3(0, 0, 0));
 		model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f)); // 绕着指定轴旋转
 
 		// 设置观察矩阵
 		glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
 
 		// 设置投影矩阵
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100000.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), float(m_Width) / float(m_Height), 0.1f, 100000.0f);
 		
 		{  /* 正交投影*/
 			//float left = -1.0f;
@@ -163,7 +163,7 @@ void WinApp::Render()   // ！渲染
 			//glm::mat4 projection = glm::ortho(left, right, bottom, top, near1, far1);
 		}	
 
-		mvp = projection * model * view;
+		mvp = projection * view * model;
 	}
 
 
