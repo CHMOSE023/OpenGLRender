@@ -6,13 +6,15 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/") # 包含文件�
 link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/deps/lib")      # 连接器搜索目录
 
 set( SRCES
-	"demo-ray"           # 
-	"Lesson01-glfw"      # 01-使用 glfw 建立OpenGL窗口
-	"Lesson02-App"       # 02-封装窗口
-    "Lesson03-texture2D" # 03-使用2D纹理
-    "Lesson04-mvp"       # 04-矩阵：模型M、观察V、投影P 
-    "Lesson05-camera"    # 05-摄像机 第一人称
-    "Lesson06-camera3rd" # 06-摄像机 第三人称 
+	"Test01-Ray"            # 射线
+	"Test02-Buffer"        # 缓冲区
+	"Lesson01-glfw"         # 01-使用 glfw 建立OpenGL窗口
+	"Lesson02-App"          # 02-封装窗口
+    "Lesson03-texture2D"    # 03-使用2D纹理
+    "Lesson04-mvp"          # 04-矩阵：模型M、观察V、投影P 
+    "Lesson05-camera"       # 05-摄像机 第一人称
+    "Lesson06-camera3rd"    # 06-摄像机 第三人称 
+    "Lesson07-VertexBuffer" # 07-顶点缓冲区 
 )
 
 set(GLAD "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c")
