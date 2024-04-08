@@ -5,6 +5,8 @@
 #include "stb_image.h"
 #include <math.h>
 #include <Windows.h>
+#include <iostream>
+#include <glm/gtx/string_cast.hpp>
 
 WinApp::WinApp() :m_pWindow(nullptr), m_Width(0), m_Height(0), m_VertexArray(0)
 {
@@ -44,11 +46,17 @@ void WinApp::MouseButtonCallback(GLFWwindow* window, int button, int action, int
 	{
 		printf("左键按下\n");
 
+		std::cout << glm::to_string(winApp->m_Role.m_Position) << std::endl;
+
+		// ！！！获取射线
 		Ray ray = winApp->m_ThirdCamera.CreateRayFromScreen(winApp->m_Xpos, winApp->m_Ypos);
+
+		// 计算鼠标与地平面交点
 		glm::vec3  dir = ray.GetDirection();
 		glm::vec3  pos = ray.GetOrigin();
 		float      tm = abs((pos.y) / dir.y);
 		glm::vec3  tp = ray.PointAt(tm);
+		std::cout << glm::to_string(tp) << std::endl;
 		winApp->m_Role.SetTarget(tp);
 
 
@@ -151,6 +159,8 @@ void WinApp::Initialize(int width, int height,const char*title)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	m_pWindow=  glfwCreateWindow(width, height, title, NULL, NULL);
+	m_Width = width;
+	m_Height = height;
 
 	if (!m_pWindow)
 	{
@@ -186,18 +196,24 @@ void WinApp::Initialize(int width, int height,const char*title)
 	// 记录上一帧的时间
 	m_LastFrameTime = glfwGetTime();
 
-	// 设置第三人称相机
+	// 设置第三人称相机	
 	m_ThirdCamera.SetRadius(50.0f);
+	m_ThirdCamera.SetViewSize(m_Width, m_Height);
 	m_ThirdCamera.Perspective(45.0f, float(width) / float(height), 0.1f, 100000.0f);
 	m_ThirdCamera.SetEye(glm::vec3(50, 50, 50));
 	m_ThirdCamera.SetTarget(m_Role.m_Position);
 	m_ThirdCamera.CalcDir();
-	m_ThirdCamera.SetUp(glm::vec3(0,1.0f,0));
+	m_ThirdCamera.SetUp(glm::vec3(0,1.0f,0));	
 	m_ThirdCamera.Update();
+
+	// 设置角色位置
+	m_Role.SetPosition(glm::vec3(0, 0.0f, -10));
+	m_Role.SetTarget(glm::vec3(0, 0.0f, -10));
 
 	// 启动深度缓冲
 	glEnable(GL_DEPTH_TEST);
 	
+	// 角色数据
 	static const Vertex vertices[6] =
 	{
 		 //       顶点                    颜色                UV                
@@ -293,7 +309,7 @@ void WinApp::Render()
 	m_LastFrameTime = currentFrameTime;                     // 更新上一帧时间
 
 	// 更新相机
-	m_ThirdCamera.SetTarget(m_Role.m_Position);
+	m_ThirdCamera.SetTarget(m_Role.m_Position);             // 相机看点跟随角色
 	m_ThirdCamera.Update();
 
 	//  绘制角色

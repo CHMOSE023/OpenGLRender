@@ -1,6 +1,7 @@
 #include "ThirdCamera.h"
 #include <glm/gtx/rotate_vector.hpp>
-
+#include <iostream>
+#include <glm/gtx/string_cast.hpp>
 ThirdCamera::ThirdCamera()
 {
 	m_Radius    = 400;
@@ -73,10 +74,10 @@ glm::vec3 ThirdCamera::GetRight() const
 void ThirdCamera::Update() 
 {
 	glm::vec3 upDir   = glm::normalize(m_Up);	
-	m_Eye     = m_Target - m_Dir * m_Radius;	// 眼睛位置
-	m_Right   = glm::normalize(glm::cross(m_Dir, upDir));	// 眼睛位置左侧
+	m_Eye             = m_Target - m_Dir * m_Radius;	            // 眼睛位置
+	m_Right           = glm::normalize(glm::cross(m_Dir, upDir));	// 眼睛位置左侧
 
-	m_matView = glm::lookAt(m_Eye, m_Target, m_Up); 	// 计算视图矩阵
+	m_matView         = glm::lookAt(m_Eye, m_Target, m_Up); 	    // 计算视图矩阵
 }
 
 void ThirdCamera::SetViewSize(const glm::vec2& viewSize)
@@ -121,7 +122,7 @@ void ThirdCamera::Perspective(float fovy, float aspect, float zNear, float zFar)
 }
 
 // 世界坐标转化为窗口坐标
-bool ThirdCamera::Project(const glm::vec4& world, glm::vec4& screen)
+bool ThirdCamera::Project(const glm::vec4& world, glm::vec4& screen)const
 {
 	screen = (m_matProj * m_matView * m_matWorld) * world;
 	if (screen.w == 0.0f)
@@ -145,7 +146,7 @@ bool ThirdCamera::Project(const glm::vec4& world, glm::vec4& screen)
 }
 
 // 世界坐标转化为窗口坐标
-glm::vec2 ThirdCamera::WordToScreen(const glm::vec3& world)
+glm::vec2 ThirdCamera::WordToScreen(const glm::vec3& world)const
 {
 	glm::vec4 worlds(world.x, world.y, world.z, 1);
 	glm::vec4 screens;
@@ -154,7 +155,7 @@ glm::vec2 ThirdCamera::WordToScreen(const glm::vec3& world)
 }
 
 //  窗口坐标转化为世界坐标
-glm::vec3 ThirdCamera::ScreenToWorld(const glm::vec2& screen)
+glm::vec3 ThirdCamera::ScreenToWorld(const glm::vec2& screen)const
 {
 	glm::vec4  screens(screen.x, screen.y, 0, 1);
 	glm::vec4  world;
@@ -163,55 +164,102 @@ glm::vec3 ThirdCamera::ScreenToWorld(const glm::vec2& screen)
 	return glm::vec3(world.x, world.y, world.z);
 }
 
-//  窗口坐标转化为世界坐标
-bool ThirdCamera::UnProject(const glm::vec4& screen, glm::vec4& world)
+
+// 屏幕坐标转换为世界坐标
+glm::vec3 ThirdCamera::ScreenToWorld(double mouseX, double mouseY)const
 {
-	glm::vec4 v;
-	v.x = screen.x;
-	v.y = screen.y;
-	v.z = screen.z;
-	v.w = 1.0;
+	int width  = m_ViewSize.x;
+	int height = m_ViewSize.y;	
 
-	// map from viewport to 0 - 1
-	v.x = (v.x) / m_ViewSize.x;
-	v.y = (m_ViewSize.y - v.y) / m_ViewSize.y;
-	//v.y = (v.y - _viewPort.Y) / _viewPort.Height;
+	// 将屏幕坐标转换为标准化设备坐标 (NDC)
+	float x = (2.0f * mouseX) / width - 1.0f;
+	float y = 1.0f - (2.0f * mouseY) / height;
 
-	// map to range -1 to 1
-	v.x = v.x * 2.0f - 1.0f;
-	v.y = v.y * 2.0f - 1.0f;
-	v.z = v.z * 2.0f - 1.0f;
-
-	// inverse逆矩阵
-	glm::mat4  inverse = glm::inverse(m_matProj * m_matView * m_matWorld);
+	// 创建裁剪坐标
+	glm::vec4 clipCoords = glm::vec4(x, y, -1.0f, 1.0f);
 	
+	// 创建逆投影矩阵和逆视图矩阵
+	glm::mat4 inverseProjectionMatrix = glm::inverse(m_matProj);
+	glm::mat4 inverseViewMatrix = glm::inverse(m_matView);
 
-	v = v * inverse;
-	if (v.w == 0.0f)
-	{
-		return false;
-	}
-	world = v / v.w;
+	// 将裁剪坐标转换为视图坐标
+	glm::vec4 eyeCoords = inverseProjectionMatrix * clipCoords;
+	eyeCoords = glm::vec4(eyeCoords.x, eyeCoords.y, -1.0f, 0.0f); // 方向向量
+
+	// 将视图坐标转换为世界坐标
+	glm::vec4 rayWorld = inverseViewMatrix * eyeCoords;
+	glm::vec3 rayDirection = glm::normalize(glm::vec3(rayWorld));
+
+	return rayDirection;
+}
+
+
+
+//  窗口坐标转换为世界坐标
+bool ThirdCamera::UnProject(const glm::vec4& screen, glm::vec4& world)const
+{
+	// glm::vec4 v(0);
+	// v.x = screen.x;
+	// v.y = screen.y;
+	// v.z = screen.z;
+	// v.w = 1.0;
+	// 
+	// // map from viewport to 0 - 1
+	// v.x = (v.x) / m_ViewSize.x;
+	// v.y = (m_ViewSize.y - v.y) / m_ViewSize.y;	
+	// 
+	// // map to range -1 to 1
+	// v.x = v.x * 2.0f - 1.0f;
+	// v.y = v.y * 2.0f - 1.0f;
+	// v.z = v.z * 2.0f - 1.0f;
+	// 
+	// glm::mat4 mvp = m_matProj * m_matView * m_matWorld;
+	// 
+	// glm::mat4  inverse = glm::inverse(mvp); //矩阵的逆
+	// 
+	// v = v * inverse;
+	// 
+	// if (v.w == 0.0f)
+	// {
+	// 	return false;
+	// }
+	// world = v / v.w;
+
+	//std::cout << glm::to_string(world) << std::endl;
 	return true;
 }
 
-Ray ThirdCamera::CreateRayFromScreen(int x, int y)
+Ray ThirdCamera::CreateRayFromScreen(int x, int y) const
 {
+	// 射线方向向量的世界坐标
+	glm::vec3 rayDirection = ScreenToWorld(x, y);
 
-	glm::vec4  minWorld;
-	glm::vec4  maxWorld;
+	// 计算拾取点的位置
+	glm::vec3 cameraPosition = glm::vec3(glm::inverse(m_matView)[3]);
+	glm::vec3 rayOrigin = cameraPosition;
+	float distanceAlongRay = -rayOrigin.z / rayDirection.z;
+	glm::vec3 pickPoint = rayOrigin + distanceAlongRay * rayDirection;
 
-	glm::vec4  screen(float(x), float(y), 0, 1);
-	glm::vec4  screen1(float(x), float(y), 1, 1);
-
-	UnProject(screen, minWorld);
-	UnProject(screen1, maxWorld);
-
-	Ray     ray;	
-	ray.SetOrigin(glm::vec3(minWorld.x, minWorld.y, minWorld.z));
-	glm::vec3  dir(maxWorld.x - minWorld.x, maxWorld.y - minWorld.y, maxWorld.z - minWorld.z);
-	ray.SetDirection(glm::normalize(dir));
-	return  ray;
+	Ray     ray1;
+	ray1.SetDirection(rayDirection);
+	ray1.SetOrigin(pickPoint);
+	return  ray1;
+	//// 屏幕坐标转为世界坐标
+	//glm::vec4  minWorld(0);
+	//glm::vec4  maxWorld(0);
+	//
+	//glm::vec4  screen (float(x), float(y), 0, 1); // 最近点与屏幕交点
+	//glm::vec4  screen1(float(x), float(y), 1, 1); // 最远点与屏幕交点
+	//
+	//UnProject(screen,  minWorld);	// 反投射计算
+	//UnProject(screen1, maxWorld);	//
+	//
+	//Ray     ray;	
+	//ray.SetOrigin(glm::vec3(minWorld.x, minWorld.y, minWorld.z));
+	//
+	//glm::vec3  dir(maxWorld.x - minWorld.x, maxWorld.y - minWorld.y, maxWorld.z - minWorld.z);
+	//ray.SetDirection(glm::normalize(dir));
+	//return  ray;
 }
 
 void ThirdCamera::RotateView(float angle)

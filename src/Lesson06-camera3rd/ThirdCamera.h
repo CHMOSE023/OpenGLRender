@@ -32,14 +32,14 @@ public:
 	void       SetProject(const glm::mat4& proj);
 	const      glm::mat4& GetProject() const;
 	const      glm::mat4& GetView() const;
-	void       Perspective(float fovy, float aspect, float zNear, float zFar);  // 透视
-	bool       Project(const glm::vec4& world, glm::vec4& screen);              // 世界坐标转化为窗口坐标
-	glm::vec2  WordToScreen(const glm::vec3& world);                            // 世界坐标转化为窗口坐标
-	glm::vec3  ScreenToWorld(const glm::vec2& screen);                          // 窗口坐标转化为世界坐标
-	bool       UnProject(const glm::vec4& screen, glm::vec4& world);
-	Ray        CreateRayFromScreen(int x, int y);
-	void       RotateView(float angle);                                         // 观察方向绕某个方向轴旋转一定的角度 
-
+	void       Perspective(float fovy, float aspect, float zNear, float zFar);       // 透视
+	bool       Project(const glm::vec4& world, glm::vec4& screen)const;              // 世界坐标转化为窗口坐标
+	glm::vec2  WordToScreen(const glm::vec3& world)const;                            // 世界坐标转化为窗口坐标
+	glm::vec3  ScreenToWorld(const glm::vec2& screen)const;                          // 窗口坐标转化为世界坐标
+	glm::vec3  ScreenToWorld(double mouseX, double mouseY)const;
+	bool       UnProject(const glm::vec4& screen, glm::vec4& world)const;
+	Ray        CreateRayFromScreen(int x, int y)const;
+	void       RotateView(float angle);                                              // 观察方向绕某个方向轴旋转一定的角度 
 public:	
 	float      m_Radius;
 	float      m_Yaw;
