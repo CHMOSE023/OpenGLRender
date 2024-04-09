@@ -4,12 +4,14 @@ project ("OpenGLRender")
 
 # 搜索目录
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/") # 包含文件搜索目录
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glew-2.1.0/") # 包含文件搜索目录
 link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/deps/lib")      # 连接器搜索目录
 
 # src内的文件夹
 set( SRC_DIRES
 	"Test01-Ray"            # 射线
 	"Test02-Buffer"         # 缓冲区
+	"Test03-Nuklear"        # NuklearUI
 	"Lesson01-GLFW"         # 01-使用 glfw 建立OpenGL窗口
 	"Lesson02-App"          # 02-封装窗口
     "Lesson03-Texture2D"    # 03-使用2D纹理
@@ -27,9 +29,11 @@ set(GLAD_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c"
 )
 
+
 # 复制textures编译目录
-file(GLOB Textures "${CMAKE_CURRENT_SOURCE_DIR}/deps/resources/textures/*.*") 
+file(GLOB Textures "${CMAKE_CURRENT_SOURCE_DIR}/deps/resources/textures/*.*" ) 
 file(COPY ${Textures} DESTINATION textures/)
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/deps/dll/glew32.dll" DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
 
 # 添加glad库
 add_library(glad ${GLAD_SRC})
@@ -37,8 +41,9 @@ add_library(glad ${GLAD_SRC})
 # 遍历src文件夹内文件，添加exe程序
 foreach(Src ${SRC_DIRES} )	
     message(${Src})
-    file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.hpp"  "src/${Src}/*.cpp" )
+    file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.hpp"  "src/${Src}/*.cpp" "src/${Src}/*.c" )
     add_executable (${Src}  ${SrcFile} )
     target_link_libraries(${Src} glfw3 openGL32 glad )
 endforeach()
 
+target_link_libraries(Test03-Nuklear  glew32 )
