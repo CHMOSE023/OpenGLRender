@@ -1,34 +1,44 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿# CMake配置文件
+cmake_minimum_required (VERSION 3.8)
 project ("OpenGLRender")
 
-
+# 搜索目录
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/") # 包含文件搜索目录
 link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/deps/lib")      # 连接器搜索目录
 
-set( SRCES
+# src内的文件夹
+set( SRC_DIRES
 	"Test01-Ray"            # 射线
-	"Test02-Buffer"        # 缓冲区
-	"Lesson01-glfw"         # 01-使用 glfw 建立OpenGL窗口
+	"Test02-Buffer"         # 缓冲区
+	"Lesson01-GLFW"         # 01-使用 glfw 建立OpenGL窗口
 	"Lesson02-App"          # 02-封装窗口
-    "Lesson03-texture2D"    # 03-使用2D纹理
-    "Lesson04-mvp"          # 04-矩阵：模型M、观察V、投影P 
-    "Lesson05-camera"       # 05-摄像机 第一人称
-    "Lesson06-camera3rd"    # 06-摄像机 第三人称 
+    "Lesson03-Texture2D"    # 03-使用2D纹理
+    "Lesson04-MVP"          # 04-矩阵：模型M、观察V、投影P 
+    "Lesson05-Camera"       # 05-摄像机 第一人称
+    "Lesson06-Camera3rd"    # 06-摄像机 第三人称 
     "Lesson07-VertexBuffer" # 07-顶点缓冲区 
     "Lesson08-FrameBuffer"  # 08-帧缓冲 
+    "Lesson09-Alphablend"   # 09-混合
 )
 
-set(GLAD "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c")
+# glad文件
+set(GLAD_SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.h" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c"
+)
 
 # 复制textures编译目录
 file(GLOB Textures "${CMAKE_CURRENT_SOURCE_DIR}/deps/resources/textures/*.*") 
 file(COPY ${Textures} DESTINATION textures/)
 
+# 添加glad库
+add_library(glad ${GLAD_SRC})
 
-foreach(Src ${SRCES} )	
+# 遍历src文件夹内文件，添加exe程序
+foreach(Src ${SRC_DIRES} )	
     message(${Src})
-    file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.hpp"  "src/${Src}/*.cpp"${GLAD})
+    file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.hpp"  "src/${Src}/*.cpp" )
     add_executable (${Src}  ${SrcFile} )
-    target_link_libraries(${Src} glfw3 openGL32  )
+    target_link_libraries(${Src} glfw3 openGL32 glad )
 endforeach()
 
