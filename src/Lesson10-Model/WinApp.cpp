@@ -1,4 +1,5 @@
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include "WinApp.h"
 #include <stdlib.h>
 #define STB_IMAGE_IMPLEMENTATION 
@@ -7,6 +8,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>
+
 
 WinApp::WinApp() :m_pWindow(nullptr), m_Width(0), m_Height(0), m_VertexArray(0)
 {
@@ -177,9 +179,12 @@ void WinApp::Initialize(int width, int height,const char*title)
 
 	// 初始化 shader
 	m_Shader.Initialize();
+	m_ShaderDirLight.Initialize();
+
 	// 加载纹理
 	m_TextureCity  = LoadTexture("textures/grass.png");
-	m_TextureGrass = LoadTexture("textures/grass.jpg");		
+	m_TextureGrass = LoadTexture("textures/grass.jpg");	
+
 
 	// 记录上一帧的时间
 	m_LastFrameTime = glfwGetTime();
@@ -198,6 +203,16 @@ void WinApp::Initialize(int width, int height,const char*title)
 	m_Role.SetPosition(glm::vec3(0, 0.0f, -10));
 	m_Role.SetTarget(glm::vec3(0, 0.0f, -10));
 
+	//unsigned vao, vbo, ebo;
+	//
+	// glGenVertexArrays(1, &vao); // 创建顶点数组对象 VAO	
+    // glGenBuffers(1, &vbo);      // 创建顶点缓冲对象 VBO	
+    // glGenBuffers(1, &ebo);      // 创建索引缓冲对象 EBO
+	//m_ModelStd.Load("model/MouseMesh.sm", vao, vbo, ebo);
+	  
+	// 读取xml模型数据
+	m_ModelStd.Load("model/MouseMesh.sm");
+
 	// 启动深度缓冲
 	glEnable(GL_DEPTH_TEST);
 	// 启用混合
@@ -206,6 +221,8 @@ void WinApp::Initialize(int width, int height,const char*title)
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glEnable(GL_BLEND);
 	//glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
+
+	
 	
 	// 角色数据
 	static const Vertex vertices[6] =
@@ -239,6 +256,8 @@ void WinApp::Initialize(int width, int height,const char*title)
 	glBindVertexArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
 
 	float   gSize = 100;
 	float   gPos = -5;
@@ -274,6 +293,8 @@ void WinApp::Initialize(int width, int height,const char*title)
 	glVertexAttribPointer(m_Shader.m_UV, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	
 	
 }
 
@@ -306,13 +327,16 @@ void WinApp::Render()
 	m_ThirdCamera.SetTarget(m_Role.m_Position);             // 相机看点跟随角色
 	m_ThirdCamera.Update();
 
-	//  绘制角色
+	// 绘制角色
+	glBindVertexArray(m_VertexArray);
 	m_Role.Render(deltaTime, m_ThirdCamera, m_Shader, m_TextureCity, m_VertexArray, 6);
+	
+
+	// 绘制模型
+	m_ModelStd.Render(m_LastFrameTime, m_ThirdCamera,m_ShaderDirLight);
 	
 	//  绘制地面
 	RenderGround();
-
-
 }
 
 void WinApp::RenderGround()
@@ -324,17 +348,16 @@ void WinApp::RenderGround()
 
 	float     angle = glfwGetTime();
 	glm::vec3  axis(0.0f, 1.0f, 0.0f); // 旋转轴	
-    
-	//matModel=glm::rotate(matModel, angle, axis);
 
 	mvp = matProj * matView * matModel;
-
+	
 	// 使用纹理2 绘制地面
 	m_Shader.Begin();
 	glBindTexture(GL_TEXTURE_2D, m_TextureGrass);// 使用纹理2
 	glBindVertexArray(m_Grounds);
 	glUniformMatrix4fv(m_Shader.m_MVP, 1, GL_FALSE, (const GLfloat*)&mvp);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
 	m_Shader.End();
 }
 

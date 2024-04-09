@@ -1,11 +1,12 @@
 #pragma once
 #include <string>
-#include "Shader_P3_C4_T2.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-//#include "linmath.h"
 #include "ThirdCamera.h"
 #include "Role.h"
-
+#include "ModelStd.h"
+#include "Shader_P3_C4_T2.h"
+#include "Shader_DirLight.h"
 typedef struct Vertex
 {
 	glm::vec3 pos;
@@ -37,17 +38,20 @@ public:
 public:
 	int           m_Width;
 	int	          m_Height;
-	GLFWwindow*   m_pWindow;	
-	Shaders       m_Shader;
+	GLFWwindow*   m_pWindow;		
 	GLuint        m_VertexArray;
 	GLuint        m_Grounds;
 	GLuint        m_TextureCity;
 	GLuint        m_TextureGrass;
 	ThirdCamera   m_ThirdCamera;
 	Role          m_Role;
-	float         m_LastFrameTime;// 记录上一帧的时间		
-	double        m_Xpos;
-	double        m_Ypos;
+	float         m_LastFrameTime; // 记录上一帧的时间		
+	double        m_Xpos;		   // 鼠标x
+	double        m_Ypos;		   // 鼠标y
+	ModelStd      m_ModelStd;      // 读取外部模型文件
+
+	Shader_P3_C4_T2  m_Shader;
+	Shader_DirLight  m_ShaderDirLight;
 
 };
 

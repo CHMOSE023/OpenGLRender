@@ -22,6 +22,7 @@ set( SRC_DIRES
     "Lesson08-FrameBuffer"  # 08-帧缓冲 
     "Lesson09-Alphablend"   # 09-混合
     "Lesson10-Model"        # 10-模型
+    
 )
 
 # glad文件
@@ -32,9 +33,10 @@ set(GLAD_SRC
 
 
 # 复制textures编译目录
-file(GLOB Textures "${CMAKE_CURRENT_SOURCE_DIR}/deps/resources/textures/*.*" ) 
-file(COPY ${Textures} DESTINATION textures/)
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/deps/dll/glew32.dll" DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
+file(GLOB Textures "${CMAKE_CURRENT_SOURCE_DIR}/deps/resources/*" 
+                   "${CMAKE_CURRENT_SOURCE_DIR}/deps/dll/*") 
+file(COPY ${Textures} DESTINATION  ${CMAKE_CURRENT_BINARY_DIR} )
+
 
 # 添加glad库
 add_library(glad ${GLAD_SRC})

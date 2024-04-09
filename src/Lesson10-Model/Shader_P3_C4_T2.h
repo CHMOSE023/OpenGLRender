@@ -64,6 +64,7 @@ public:
         {
             m_MVP      = glGetUniformLocation(m_ShaderId, "MVP");
             m_Texture  = glGetUniformLocation(m_ShaderId, "texture");
+
             m_Position = glGetAttribLocation (m_ShaderId, "aPos");
             m_Color    = glGetAttribLocation (m_ShaderId, "aColor");
             m_UV       = glGetAttribLocation (m_ShaderId, "aTexCoord");
@@ -76,11 +77,15 @@ public:
     {
         glUseProgram(m_ShaderId);
         glEnableVertexAttribArray(m_Position);
+        glEnableVertexAttribArray(m_Color);
+        glEnableVertexAttribArray(m_UV);
     }
   
     virtual void  End()
     {
         glDisableVertexAttribArray(m_Position);
+        glDisableVertexAttribArray(m_Color);
+        glDisableVertexAttribArray(m_UV);
         glUseProgram(0);
     }
 
