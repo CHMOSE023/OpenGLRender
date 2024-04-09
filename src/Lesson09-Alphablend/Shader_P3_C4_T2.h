@@ -47,6 +47,8 @@ public:
                 void main()
                 {
                     vec4 textureColor = texture2D(texture,outTexCoord);
+                    //fragment = textureColor * outColor;
+                    // alpha小于0.2时，丢弃颜色。
                     if(textureColor.a<=0.2)
                     {
                        discard;

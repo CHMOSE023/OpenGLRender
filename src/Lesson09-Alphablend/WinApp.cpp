@@ -44,50 +44,41 @@ void WinApp::MouseButtonCallback(GLFWwindow* window, int button, int action, int
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-		printf("左键按下\n");
-
-		std::cout << glm::to_string(winApp->m_Role.m_Position) << std::endl;
-
 		// ！！！获取射线
 		Ray ray = winApp->m_ThirdCamera.CreateRayFromScreen(winApp->m_Xpos, winApp->m_Ypos);
-
 		// 计算鼠标与地平面交点
 		glm::vec3  dir = ray.GetDirection();
 		glm::vec3  pos = ray.GetOrigin();
-		float      tm = abs((pos.y) / dir.y);
-		glm::vec3  tp = ray.PointAt(tm);
-		std::cout << glm::to_string(tp) << std::endl;
+		float      tm  = abs((pos.y) / dir.y);
+		glm::vec3  tp  = ray.PointAt(tm);
+		//std::cout << glm::to_string(tp) << std::endl;
 		winApp->m_Role.SetTarget(tp);
-
 
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
 	{
-		printf("左键抬起");
+		
 	}
 	
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
 	{
 		bRightFlg = true;
 		m_RightDowm = glm::vec2(winApp->m_Xpos, winApp->m_Ypos);
-
-		printf("右键按下");
 	}
 
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
 	{
 		bRightFlg = false;
-		printf("右键抬起");
 	}
 
 	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
 	{
-		printf("滚轮按下");
+	
 	}
 
 	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE)
 	{
-		printf("滚轮抬起");
+		
 	}
 
 	//printf("CursorPosition:\txpos %0.3f,ypos %0.3f\n", winApp->m_Xpos, winApp->m_Ypos);
@@ -133,9 +124,6 @@ void WinApp::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 		winApp->m_ThirdCamera.SetRadius(winApp->m_ThirdCamera.GetRadius() * 0.8f);
 		winApp->m_ThirdCamera.Update();
 	}
-
-
-	printf("%f,%f\n", xoffset, yoffset);
 }
 
 // 获取 glfw 窗口的用户数据，转换成 WinApp类指针。
@@ -212,10 +200,12 @@ void WinApp::Initialize(int width, int height,const char*title)
 
 	// 启动深度缓冲
 	glEnable(GL_DEPTH_TEST);
-
+	// 启用混合
+	glEnable(GL_BLEND);
 	// 混合方程
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
 	
 	// 角色数据
 	static const Vertex vertices[6] =
