@@ -25,6 +25,7 @@ set( SRC_DIRES
     "Lesson10-Model"        # 10-外部模型
     "Lesson11-Animation2D"  # 11-动画基于图片
     "Lesson12-Animation3D"  # 12-动画基于关键帧
+    "Lesson13-SkinBase"     # 13-骨骼动画节点原理
     
 )
 
