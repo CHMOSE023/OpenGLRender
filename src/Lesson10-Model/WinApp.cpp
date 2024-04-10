@@ -212,7 +212,8 @@ void WinApp::Initialize(int width, int height,const char*title)
 	  
 	// 读取xml模型数据
 	//m_pModelStd = new ModelStd();	
-	m_pModelStd.Load("model/MouseMesh.sm", m_ShaderDirLight);
+	m_pModelStd.SetShader(m_ShaderDirLight);
+	m_pModelStd.Load("model/MouseMesh.sm");
 	
 
 	// 启动深度缓冲

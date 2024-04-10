@@ -19,13 +19,10 @@ public :
 	};
 public:
 
-	ModelStd();;
-	ModelStd(Shader_DirLight  m_Shader);
-	~ModelStd();;
+	ModelStd();	
+	~ModelStd();
 public:
 	bool Load(const char* fileName);
-	bool Load(const char* fileName, Shader_DirLight  m_Shader);
-
 	// 解析面索引信息
 	void ParseFaceIndex(rapidxml::xml_node<>* faceRoot);
 	// 解析顶点信息

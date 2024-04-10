@@ -8,15 +8,6 @@ ModelStd::ModelStd()
 	m_Size = 0;
 }
 
-ModelStd::ModelStd(Shader_DirLight  shader)
-{
-	m_VAO  = 0;
-	m_VBO  = 0;
-	m_EBO  = 0;
-	m_Size = 0;
-	m_Shader = shader;
-}
-
 ModelStd::~ModelStd()
 {
 	// 清理数据
@@ -37,57 +28,7 @@ bool ModelStd::Load(const char* fileName)  // 加载数据
 
 	try
 	{
-		rapidxml::xml_document<>    doc;
-		rapidxml::xml_node<>* rootNode = 0;
-		rapidxml::xml_node<>* meshNode = 0;
-		rapidxml::xml_node<>* faceRoot = 0;
-		rapidxml::xml_node<>* vertRoot = 0;
-		doc.parse<0>(xmlData);
-		rootNode = doc.first_node("MeshRoot");
-		if (rootNode == 0)
-		{
-			return  false;
-		}
-		meshNode = rootNode->first_node();
-		if (meshNode == 0)
-		{
-			return  false;
-		}
-
-		/// 解析顶点
-		faceRoot = meshNode->first_node("faceIndex");
-		ParseFaceIndex(faceRoot);
-
-		/// 解析顶点数据
-		vertRoot = meshNode->first_node("vertex");
-		ParseVertex(vertRoot);
-
-
-
-		delete[] xmlData;
-		return  true;
-	}
-	catch (...)
-	{
-		return  false;
-	}
-
-}
-
-bool ModelStd::Load(const char* fileName, Shader_DirLight  shader)  // 加载数据
-{
-	m_Shader = shader;
-	size_t  length = 0;
-	char* xmlData = ReadFile(fileName, length);
-	if (xmlData == 0)
-	{
-		printf("ModelStd.h：读取失败...");
-		return  false;
-	}
-
-	try
-	{
-		rapidxml::xml_document<>    doc;
+		rapidxml::xml_document<>    doc ;
 		rapidxml::xml_node<>* rootNode = 0;
 		rapidxml::xml_node<>* meshNode = 0;
 		rapidxml::xml_node<>* faceRoot = 0;
@@ -123,7 +64,6 @@ bool ModelStd::Load(const char* fileName, Shader_DirLight  shader)  // 加载数据
 }
 
 // 解析面索引信息
-
 void ModelStd::ParseFaceIndex(rapidxml::xml_node<>* faceRoot)
 {
 	std::vector<short>          arIndex;
@@ -138,12 +78,7 @@ void ModelStd::ParseFaceIndex(rapidxml::xml_node<>* faceRoot)
 		arIndex.push_back(short(c));
 	}
 
-
 	m_Size = arIndex.size();
-	glGenVertexArrays(1, &m_VAO); // 创建顶点数组对象 VAO	
-	glGenBuffers(1, &m_VBO);      // 创建顶点缓冲对象 VBO	
-	glGenBuffers(1, &m_EBO);      // 创建索引缓冲对象 EBO
-
 	glBindVertexArray(m_VAO);     // 绑定 VAO		
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, arIndex.size() * sizeof(short), &arIndex.front(), GL_STATIC_DRAW);
@@ -152,7 +87,6 @@ void ModelStd::ParseFaceIndex(rapidxml::xml_node<>* faceRoot)
 }
 
 // 解析顶点信息
-
 void ModelStd::ParseVertex(rapidxml::xml_node<>* vertRoot)
 {
 	std::vector<Vertex>         arVert;
@@ -232,6 +166,9 @@ void ModelStd::Render(float fElapsed, ThirdCamera& camera, Shader_DirLight& shad
 void ModelStd::SetShader(Shader_DirLight shader)
 {
 	m_Shader = shader;
+	glGenVertexArrays(1, &m_VAO); // 创建顶点数组对象 VAO	
+	glGenBuffers(1, &m_VBO);      // 创建顶点缓冲对象 VBO	
+	glGenBuffers(1, &m_EBO);      // 创建索引缓冲对象 EBO
 }
 
 // 读取文件
