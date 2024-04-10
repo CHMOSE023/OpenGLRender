@@ -42,7 +42,14 @@ public:
                 void main()
                 {
                     vec4 textureColor = texture2D(texture,outTexCoord);
-                    fragment          = textureColor;
+
+                   if( textureColor.a <= 0.2 )
+                    {
+                       discard;
+                    }else{
+                      fragment = textureColor ;
+                    }                  
+                    
                 }
           )";
        
