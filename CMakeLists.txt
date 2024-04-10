@@ -23,7 +23,8 @@ set( SRC_DIRES
     "Lesson08-FrameBuffer"  # 08-帧缓冲 
     "Lesson09-Alphablend"   # 09-混合
     "Lesson10-Model"        # 10-外部模型
-    "Lesson11-Animation2D"  # 12-动画2D
+    "Lesson11-Animation2D"  # 11-动画基于图片
+    "Lesson12-Animation3D"  # 12-动画基于关键帧
     
 )
 
