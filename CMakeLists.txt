@@ -22,7 +22,8 @@ set( SRC_DIRES
     "Lesson07-VertexBuffer" # 07-顶点缓冲区 
     "Lesson08-FrameBuffer"  # 08-帧缓冲 
     "Lesson09-Alphablend"   # 09-混合
-    "Lesson10-Model"        # 10-模型
+    "Lesson10-Model"        # 10-外部模型
+    "Lesson11-Animation2D"  # 12-动画2D
     
 )
 
