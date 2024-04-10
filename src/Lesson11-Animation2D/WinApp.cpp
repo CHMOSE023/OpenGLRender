@@ -80,9 +80,9 @@ void WinApp::Initialize(int width, int height,const char*title)
 	glVertexAttribPointer(m_Shader.m_UV, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
 	// 启用混合
-	glEnable(GL_BLEND);
+	//glEnable(GL_BLEND);
 	// 混合方程
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 }
 
@@ -95,7 +95,7 @@ void WinApp::Run()
 		glViewport(0, 0, m_Width, m_Height);
 
 		glClear(GL_COLOR_BUFFER_BIT);
-		glClearColor(0.1f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0, 0, 0, 0.0f);
 
 		Render();
 
