@@ -211,12 +211,14 @@ void WinApp::Initialize(int width, int height,const char*title)
 	//m_ModelStd.Load("model/MouseMesh.sm", vao, vbo, ebo);
 	  
 	// 读取xml模型数据
-	m_ModelStd.Load("model/MouseMesh.sm");
+	m_pModelStd = new ModelStd();
+	m_pModelStd->Load("model/MouseMesh.sm");
+	//m_ModelStd.Load("model/MouseMesh.sm");
 
 	// 启动深度缓冲
 	glEnable(GL_DEPTH_TEST);
 	// 启用混合
-	glEnable(GL_BLEND);
+	//glEnable(GL_BLEND);
 	// 混合方程
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glEnable(GL_BLEND);
@@ -333,7 +335,8 @@ void WinApp::Render()
 	
 
 	// 绘制模型
-	m_ModelStd.Render(m_LastFrameTime, m_ThirdCamera,m_ShaderDirLight);
+	m_pModelStd->Render(m_LastFrameTime, m_ThirdCamera, m_ShaderDirLight);
+	//m_ModelStd.Render(m_LastFrameTime, m_ThirdCamera,m_ShaderDirLight);
 	
 	//  绘制地面
 	RenderGround();

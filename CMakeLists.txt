@@ -12,6 +12,7 @@ set( SRC_DIRES
 	"Test01-Ray"            # 射线
 	"Test02-Buffer"         # 缓冲区
 	"Test03-Nuklear"        # NuklearUI
+	"Test04-VAO"            # 测试 VAO VBO EBO
 	"Lesson01-GLFW"         # 01-使用 glfw 建立OpenGL窗口
 	"Lesson02-App"          # 02-封装窗口
     "Lesson03-Texture2D"    # 03-使用2D纹理

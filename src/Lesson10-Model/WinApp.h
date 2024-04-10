@@ -48,7 +48,7 @@ public:
 	float         m_LastFrameTime; // 记录上一帧的时间		
 	double        m_Xpos;		   // 鼠标x
 	double        m_Ypos;		   // 鼠标y
-	ModelStd      m_ModelStd;      // 读取外部模型文件
+	ModelStd*     m_pModelStd;     // 读取外部模型文件
 
 	Shader_P3_C4_T2  m_Shader;
 	Shader_DirLight  m_ShaderDirLight;

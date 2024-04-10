@@ -199,9 +199,11 @@ void ModelStd::Render(float fElapsed, ThirdCamera& camera, Shader_DirLight& shad
 	mv =   view * model;	
 
 
+	
 
 	shader.Begin();
 	{
+		
 		// 每次会之前绑定	
 		glBindVertexArray(m_VAO);     // 绑定 VAO	
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
