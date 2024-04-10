@@ -81,17 +81,11 @@ public:
 
     virtual void Begin()
     {
-        glUseProgram(m_ShaderId);
-        glEnableVertexAttribArray(m_Position);
-        glEnableVertexAttribArray(m_Uv);
-        glEnableVertexAttribArray(m_Normal);
+        glUseProgram(m_ShaderId); 
     }
 
     virtual void  End()
-    {
-        glDisableVertexAttribArray(m_Position);
-        glDisableVertexAttribArray(m_Uv);
-        glDisableVertexAttribArray(m_Normal);
+    {      
         glUseProgram(0);
     }
 

@@ -8,6 +8,15 @@ ModelStd::ModelStd()
 	m_Size = 0;
 }
 
+ModelStd::ModelStd(Shader_DirLight  shader)
+{
+	m_VAO  = 0;
+	m_VBO  = 0;
+	m_EBO  = 0;
+	m_Size = 0;
+	m_Shader = shader;
+}
+
 ModelStd::~ModelStd()
 {
 	// 清理数据
@@ -65,11 +74,9 @@ bool ModelStd::Load(const char* fileName)  // 加载数据
 
 }
 
-bool ModelStd::Load(const char* fileName, unsigned vao, unsigned vbo, unsigned ebo)  // 加载数据
+bool ModelStd::Load(const char* fileName, Shader_DirLight  shader)  // 加载数据
 {
-	m_VAO = vao;
-	m_VBO = vbo;
-	m_EBO = ebo;
+	m_Shader = shader;
 	size_t  length = 0;
 	char* xmlData = ReadFile(fileName, length);
 	if (xmlData == 0)
@@ -104,8 +111,6 @@ bool ModelStd::Load(const char* fileName, unsigned vao, unsigned vbo, unsigned e
 		/// 解析顶点数据
 		vertRoot = meshNode->first_node("vertex");
 		ParseVertex(vertRoot);
-
-
 
 		delete[] xmlData;
 		return  true;
@@ -161,12 +166,13 @@ void ModelStd::ParseVertex(rapidxml::xml_node<>* vertRoot)
 		arVert.push_back(vertex);
 	}
 
-
 	glBindVertexArray(m_VAO);     // 绑定 VAO
 	// 绑定 VBO 并填充数据
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, arVert.size() * sizeof(Vertex), &arVert.front(), GL_STATIC_DRAW);
-
+	glVertexAttribPointer(m_Shader.m_Position, 3, GL_FLOAT, false, sizeof(Vertex), 0);
+	glVertexAttribPointer(m_Shader.m_Uv, 2, GL_FLOAT, false, sizeof(Vertex), (void*)12);
+	glVertexAttribPointer(m_Shader.m_Normal, 3, GL_FLOAT, false, sizeof(Vertex), (void*)20);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 }
@@ -194,46 +200,38 @@ void ModelStd::Render(float fElapsed, ThirdCamera& camera, Shader_DirLight& shad
 	glm::mat4 mv;			
 	// 设置模型矩阵
 	glm::mat4 model      = glm::mat4(1.0f);          // 初始化为单位矩阵	
+	model                = glm::scale(model,glm::vec3(0.1,0.1,0.1)); // 缩小0.1
 	glm::mat4 view       = camera.GetView();         // 设置观察矩阵			
 	glm::mat4 projection = camera.GetProject();      // 设置投影矩阵
-	mv =   view * model;	
-
-
-	
+	mv =   view * model;		
+	glm::mat3  matNor(1); // 法线 
+	matrix4ToMatrix3(matNor, mv);
 
 	shader.Begin();
-	{
-		
-		// 每次会之前绑定	
-		glBindVertexArray(m_VAO);     // 绑定 VAO	
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+	{	
 
-		glm::mat3  matNor(1); // 法线 
-		matrix4ToMatrix3(matNor, mv);
-		//glUniform1i(shader.m_Texture, 0);
+		glUniform1i(shader.m_Texture, 0);	
 		//! 绘制地面
 		glUniformMatrix4fv(shader.m_Mv, 1, false, (const GLfloat*)&mv);
 		glUniformMatrix4fv(shader.m_Project, 1, false, (const GLfloat*)&projection);
 		glUniformMatrix3fv(shader.m_NormalMat, 1, false, (const GLfloat*)&matNor);
-
 		glUniform3f(shader.m_AmbientColor, 0.2f, 0.2f, 0.2f);
 		glUniform3f(shader.m_LightDirection, 0.0f, 1.0f, 0.0f);
 		glUniform3f(shader.m_DiffuseColor, 0.3f, 0.3f, 0.3f);
 
-		// 设置顶点属性指针
-		glVertexAttribPointer(shader.m_Position, 3, GL_FLOAT, false, sizeof(Vertex), 0);
-		glVertexAttribPointer(shader.m_Uv, 2, GL_FLOAT, false, sizeof(Vertex), (void*)12);
-		glVertexAttribPointer(shader.m_Normal, 3, GL_FLOAT, false, sizeof(Vertex), (void*)20);
-		glVertexAttribPointer(shader.m_Position, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);	
-		
-		
-		glDrawElements(GL_TRIANGLES, m_Size, GL_UNSIGNED_INT, 0);
+		// 每次会之前绑定	
+		glBindVertexArray(m_VAO);     // 绑定 VAO	
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+		glDrawElements(GL_TRIANGLES, m_Size, GL_UNSIGNED_SHORT, 0);
 		glBindVertexArray(0);
 	}
 
-	shader.End();
-	
+	shader.End();	
+}
+
+void ModelStd::SetShader(Shader_DirLight shader)
+{
+	m_Shader = shader;
 }
 
 // 读取文件

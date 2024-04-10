@@ -17,7 +17,7 @@ set( SRC_DIRES
 	"Lesson02-App"          # 02-封装窗口
     "Lesson03-Texture2D"    # 03-使用2D纹理
     "Lesson04-MVP"          # 04-矩阵：模型M、观察V、投影P 
-    "Lesson05-Camera"       # 05-摄像机 第一人称
+    "Lesson05-Camera"       # 05-摄像机 第一人称 
     "Lesson06-Camera3rd"    # 06-摄像机 第三人称 
     "Lesson07-VertexBuffer" # 07-顶点缓冲区 
     "Lesson08-FrameBuffer"  # 08-帧缓冲 
