@@ -48,7 +48,7 @@ public:
                 {
                     vec4 textureColor = texture2D(texture,outTexCoord);
                     //fragment          = textureColor * outColor;
-                    fragment          = vec4(1.0,1,0,0);
+                    fragment          = outColor;//vec4(1.0,1,0,0);
                 }
           )";
        
@@ -69,12 +69,12 @@ public:
     virtual void Begin()
     {
         glUseProgram(m_ShaderId);
-        glEnableVertexAttribArray(m_Position);
+       // glEnableVertexAttribArray(m_Position);
     }
   
     virtual void  End()
     {
-        glDisableVertexAttribArray(m_Position);
+       // glDisableVertexAttribArray(m_Position);
         glUseProgram(0);
     }
 
