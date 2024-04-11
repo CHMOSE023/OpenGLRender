@@ -10,7 +10,7 @@ public:
 	}
 	~Timestamp() {};
 
-	void UpDate()
+	void Update()
 	{
 		::QueryPerformanceCounter(&m_Start);      // 获取当前 CPU 周期计数值
 	}
