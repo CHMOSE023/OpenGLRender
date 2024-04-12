@@ -15,7 +15,7 @@ private:
     {
     public:
         float	m_weight;
-        size_t	m_index;
+        int  	m_index;
     };
     typedef	std::vector<Weight>	        weight_list; // 顶点影响度，一个顶点有多个影响度，一个骨头被多个顶点影响
     typedef	std::vector<weight_list>    arrayweight; // 权重, 顶点影响度集合   
@@ -76,10 +76,10 @@ private:
             end = 0;
             length = 0;
         }
-        size_t	id;
-        size_t	begin;
-        size_t	end;
-        size_t	length;
+        int	id;
+        int	begin;
+        int	end;
+        int	length;
     };
 
     struct  Vertex
@@ -95,7 +95,7 @@ public:
 public:
     void Load(const char* meshName, const char* skinName);   
     void Render(float fElapsed, ThirdCamera& camera);
-    void Startup(Shader_DirLight shader);
+    void SetShader(Shader_DirLight shader);
 private:   
     void LoadSkin(const char* fileName);                       // 解析骨骼信息
     std::string	ReadString(FILE* _pFile, const CHUNK& _chunk);  
@@ -117,6 +117,7 @@ public:
     float           m_times;          // 时间                                     
     unsigned        m_VAO;		      // 创建顶点数组对象 VAO	
     unsigned        m_VBO;		      // 创建顶点缓冲对象 VBO	
+    unsigned        m_EBO;		      // 创建顶点缓冲对象 VBO	
     Shader_DirLight m_Shader;       
 
 };

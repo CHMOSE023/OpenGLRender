@@ -12,7 +12,7 @@ ModelStd::~ModelStd()
 
 void ModelStd::Load(const char* meshName, const char* skinName)
 {
-    LoadMesh(meshName); // 二进制
+    LoadMesh(meshName); // xml
     LoadSkin(skinName); // 二进制
 }
 
@@ -25,7 +25,7 @@ void ModelStd::LoadSkin(const char* fileName)
         return;
     }
     fseek(pFile, 0, SEEK_END);
-    size_t	iSize = ftell(pFile);
+    int	iSize = ftell(pFile);
     fseek(pFile, 0, SEEK_SET);
     CHUNK	chunk;
     while (fread(&chunk, sizeof(CHUNK), 1, pFile))
@@ -34,30 +34,32 @@ void ModelStd::LoadSkin(const char* fileName)
         {
         case ECHUNK_MAGIC:
         {
-            unsigned char data[4];
-            unsigned char magic[4] = { 'C','E','L','L' };
-            fread(data, 4, 1, pFile);
+            char   data[4];
+            char   magic[4] = { 'C','E','L','L' };
+            // fseek(pFile, 0x10, SEEK_SET);
+            fread(data, sizeof(data) ,1 , pFile);
             if (memcmp(data, magic, 4) != 0)
             {
                 fclose(pFile);
                 return;
             }
             else
-            {
+            {   
                 fseek(pFile, (long)chunk.end, SEEK_SET);
             }
+           
         }
         break;
         case ECHUNK_VERSION:
         {
-            size_t	iVersion;
-            fread(&iVersion, sizeof(size_t), 1, pFile);
+            int	iVersion;
+            fread(&iVersion, sizeof(int), 1, pFile);
             fseek(pFile, (long)chunk.end, SEEK_SET);
         }
         break;
         case ECHUNK_SKIN_BONE:       // 骨头，每个骨头一个矩阵
         {
-            size_t	iSize = chunk.length / sizeof(glm::mat4(1));
+            int	iSize = chunk.length / sizeof(glm::mat4(1));
             m_arBone.resize(iSize);
             fread(&m_arBone[0], chunk.length, 1, pFile);
         }
@@ -66,14 +68,15 @@ void ModelStd::LoadSkin(const char* fileName)
         {
 
             m_arWeight.resize(m_arVertex.size());
-            size_t	iIndex = 0;
-
+            int	iIndex = 0;
+          
+            // 
             while (ftell(pFile) < (long)chunk.end)
-            {
+            {                
                 //!	读weight
                 CHUNK	cTemp;
                 fread(&cTemp, sizeof(CHUNK), 1, pFile);
-                size_t	iSize = cTemp.length / sizeof(Weight);
+                int 	iSize = cTemp.length / sizeof(Weight);
                 m_arWeight[iIndex].resize(iSize);
                 switch (cTemp.id)
                 {
@@ -103,7 +106,7 @@ void ModelStd::LoadSkin(const char* fileName)
                 case ECHUNK_SKIN_ANIMATION_FRAME:
                 {
                     arraybone	arMatrix;
-                    size_t	iSize = cTemp.length / sizeof(glm::mat4(1)); //!!!
+                    int 	iSize = cTemp.length / sizeof(glm::mat4(1)); //!!!
                     arMatrix.resize(iSize);
                     fread(&arMatrix[0], cTemp.length, 1, pFile);
                     m_arFrame.push_back(arMatrix);
@@ -127,8 +130,7 @@ std::string ModelStd::ReadString(FILE* _pFile, const CHUNK& _chunk)
     return	strText;
 }
 
-// 加载模型数据
-
+// 加载面数据
 bool ModelStd::LoadMesh(const char* fileName)
 {
     /// 读文件
@@ -171,14 +173,13 @@ bool ModelStd::LoadMesh(const char* fileName)
     catch (...)
     {
         return  false;
-    }
+    }   
 }
 
-// 解析面信息
-
+// 解析面信息 
 void ModelStd::ParseFaceIndex(rapidxml::xml_node<>* faceRoot)
 {
-    std::vector<short>          arIndex;
+   
     rapidxml::xml_node<>* pFaceIndex = faceRoot->first_node();
     for (; pFaceIndex; pFaceIndex = pFaceIndex->next_sibling())
     {
@@ -189,15 +190,21 @@ void ModelStd::ParseFaceIndex(rapidxml::xml_node<>* faceRoot)
         m_arFace.push_back(short(b));
         m_arFace.push_back(short(c));
     }
+
+
+    glBindVertexArray(m_VAO);     // 绑定 VAO		
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_arFace.size() * sizeof(short), &m_arFace.front(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 // 解析顶点信息
-
 void ModelStd::ParseVertex(rapidxml::xml_node<>* vertRoot)
 {
     std::vector<Vertex>         arVert;
-    rapidxml::xml_attribute<>* attrSize = vertRoot->first_attribute("size");
-    rapidxml::xml_node<>* vertNode = vertRoot->first_node();
+    rapidxml::xml_attribute<>*  attrSize = vertRoot->first_attribute("size");
+    rapidxml::xml_node<>*       vertNode = vertRoot->first_node();
     for (; vertNode; vertNode = vertNode->next_sibling())
     {
         const char* pzVert = vertNode->value();
@@ -213,27 +220,37 @@ void ModelStd::ParseVertex(rapidxml::xml_node<>* vertRoot)
             &vertex.nxyz.z);
 
         // 交换 z y
-        float	temp = vertex.xyz.z;
-        vertex.xyz.z = vertex.xyz.y;
-        vertex.xyz.y = -temp;
+       // float	temp = vertex.xyz.z;
+       // vertex.xyz.z = vertex.xyz.y;
+       // vertex.xyz.y = -temp;
 
         m_arVertex.push_back(vertex);
         m_arPos.push_back(vertex.xyz);
-    }
+    }  
+
 }
 
 // ！！！播放函数
 
 void ModelStd::Play(float findex)
 {
-    size_t	        iIndex = (size_t)findex % m_arFrame.size(); // 当前帧取模，得到帧数索引
+    size_t	iIndex;
+    if (m_arFrame.size() > 0)
+    {
+        iIndex = (size_t)findex % m_arFrame.size(); // 当前帧取模，得到帧数索引
+    }
+    else
+    {
+        return;
+    }
     // 当前帧有多块骨头。
-    arraybone& arFrame = m_arFrame[iIndex];
-    arrayvertex& arrVert = m_arVertex;     // 顶点数据
-    arrayfloat3& arrPos = m_arPos;        // 顶点信息
-    arrayweight& arrWeight = m_arWeight;     // 权重列表
-    arraybone& arrBone = m_arBone;       // 骨骼列表
-    size_t	        iSize = arrVert.size(); // 顶点个数
+    arraybone&        arFrame    = m_arFrame[iIndex];
+    arrayvertex&      arrVert    = m_arVertex;     // 顶点数据
+    arrayfloat3&      arrPos     = m_arPos;        // 顶点信息
+    arrayweight&      arrWeight  = m_arWeight;     // 权重列表
+    arraybone&        arrBone    = m_arBone;       // 骨骼列表
+    size_t	          iSize      = arrVert.size(); // 顶点个数
+
     //!	更新所有点(现在点和weight是一一对应的)
     for (size_t i = 0; i < iSize; ++i) // 
     {
@@ -248,38 +265,65 @@ void ModelStd::Play(float findex)
         {
             size_t	iIndex = wgtList[j].m_index;
             point = arrBone[iIndex] * glm::vec4(pos, 1.0);   // 位置变换
-            vtx.xyz += (arFrame[iIndex] * wgtList[j].m_weight * glm::vec4(point, 1.0)); // 帧信息 * 权重 * 位置
+
+            glm::mat4 mat1 = arFrame[iIndex];
+            glm::mat4 mat2 = wgtList[j].m_weight;
+            glm::vec4 vec4 = glm::vec4(point, 1.0);
+
+            glm::vec3 temp = mat1 * mat2 * vec4;  // 帧信息 * 权重 * 位置
+
+            vtx.xyz += temp;
+           // vtx.xyz += arFrame[iIndex] * wgtList[j].m_weight * glm::vec4(point, 1.0);  // 帧信息 * 权重 * 位置
         }
     }
+
+    // 更VBO数据
+    glBindVertexArray(m_VAO);     // 绑定 VAO
+    // 绑定 VBO 并填充数据
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, m_arVertex.size() * sizeof(Vertex), &m_arVertex.front(), GL_STATIC_DRAW);
+    glVertexAttribPointer(m_Shader.m_Position, 3, GL_FLOAT, false, sizeof(Vertex), 0);
+    glVertexAttribPointer(m_Shader.m_Uv, 2, GL_FLOAT, false, sizeof(Vertex), (void*)12);
+    glVertexAttribPointer(m_Shader.m_Normal, 3, GL_FLOAT, false, sizeof(Vertex), (void*)20);
+    glEnableVertexAttribArray(m_Shader.m_Position);
+    glEnableVertexAttribArray(m_Shader.m_Uv);
+    glEnableVertexAttribArray(m_Shader.m_Normal);
+    //glBindVertexArray(0);
+
 }
 
 void ModelStd::Render(float fElapsed, ThirdCamera& camera)
 {
     m_times += fElapsed * 30; // 每秒30帧，
     Play(m_times);
+
     m_Shader.Begin();
     {
+        glm::mat4 mv;
+        // 设置模型矩阵
+        glm::mat4 model = glm::mat4(1.0f);          // 初始化为单位矩阵	
+        model = glm::scale(model, glm::vec3(0.1, 0.1, 0.1)); // 缩小0.1
+        glm::mat4 view = camera.GetView();         // 设置观察矩阵			
+        glm::mat4 projection = camera.GetProject();      // 设置投影矩阵
+        mv = view * model;
+        glm::mat3  matNor(1); // 法线 
+        matrix4ToMatrix3(matNor, mv);
 
-        glm::mat4   matModel(1);
-        glm::mat4   matView = camera.GetView();
-        glm::mat4   matProj = camera.GetProject();
 
-        glm::mat4   matRot = glm::rotate(glm::mat4(1), glm::radians(-90.0f), glm::vec3(1, 0, 0));
-        glm::mat4   MVP = matView * matRot;
-
-        glm::mat3   matNor;
-
-        matrix4ToMatrix3(matNor, MVP);
         glUniform1i(m_Shader.m_Texture, 0);
-        glUniformMatrix4fv(m_Shader.m_Mv, 1, false, glm::value_ptr(MVP));
-        glUniformMatrix4fv(m_Shader.m_Project, 1, false, glm::value_ptr(matProj));
-        glUniformMatrix3fv(m_Shader.m_NormalMat, 1, false, &matNor[0][0]);
+        //! 绘制地面
+        glUniformMatrix4fv(m_Shader.m_Mv, 1, false, (const GLfloat*)&mv);
+        glUniformMatrix4fv(m_Shader.m_Project, 1, false, (const GLfloat*)&projection);
+        glUniformMatrix3fv(m_Shader.m_NormalMat, 1, false, (const GLfloat*)&matNor);
         glUniform3f(m_Shader.m_AmbientColor, 0.2f, 0.2f, 0.2f);
         glUniform3f(m_Shader.m_LightDirection, 0.0f, 1.0f, 0.0f);
         glUniform3f(m_Shader.m_DiffuseColor, 0.3f, 0.3f, 0.3f);
 
-        glBindVertexArray(m_VAO);
-        glDrawElements(GL_TRIANGLES, m_arFace.size(), GL_UNSIGNED_SHORT, &m_arFace.front());
+        // 每次会之前绑定	
+        glBindVertexArray(m_VAO);     // 绑定 VAO	
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+        glDrawElements(GL_TRIANGLES, m_arFace.size(), GL_UNSIGNED_SHORT, 0);
+        glBindVertexArray(0);
 
     }
     m_Shader.End();
@@ -319,25 +363,34 @@ char* ModelStd::ReadFile(const char* fileName, size_t& size)
     return  buffer;
 }
 
-void ModelStd::Startup(Shader_DirLight shader)
+void ModelStd::SetShader(Shader_DirLight shader)
 {
     m_Shader = shader;
     glGenVertexArrays(1, &m_VAO); // 创建顶点数组对象 VAO	
     glGenBuffers(1, &m_VBO);      // 创建顶点缓冲对象 VBO	       
+    glGenBuffers(1, &m_EBO);      // 创建顶点缓冲对象 VBO	       
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_arVertex.size() * sizeof(Vertex), &m_arVertex.front(), GL_STATIC_DRAW);
-    glVertexAttribPointer(m_Shader.m_Position, 3, GL_FLOAT, false, sizeof(Vertex), 0);
-    glVertexAttribPointer(m_Shader.m_Uv, 2, GL_FLOAT, false, sizeof(Vertex), (void*)12);
-    glVertexAttribPointer(m_Shader.m_Normal, 3, GL_FLOAT, false, sizeof(Vertex), (void*)20);
+  // // 绑定 VBO 并填充数据
+  // glBindBuffer(GL_ARRAY_BUFFER, m_VBO);   
+  // glBufferData(GL_ARRAY_BUFFER, m_arVertex.size() * sizeof(Vertex), &m_arVertex.front(), GL_STATIC_DRAW);
+  // glVertexAttribPointer(m_Shader.m_Position, 3, GL_FLOAT, false, sizeof(Vertex), 0);
+  // glVertexAttribPointer(m_Shader.m_Uv, 2, GL_FLOAT, false, sizeof(Vertex), (void*)12);
+  // glVertexAttribPointer(m_Shader.m_Normal, 3, GL_FLOAT, false, sizeof(Vertex), (void*)20);
+  //
+  // glEnableVertexAttribArray(m_Shader.m_Position);
+  // glEnableVertexAttribArray(m_Shader.m_Uv);
+  // glEnableVertexAttribArray(m_Shader.m_Normal);		
+  //
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_arFace.size() * sizeof(short), &m_arFace.front(), GL_STATIC_DRAW);
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glEnableVertexAttribArray(m_Shader.m_Position);
-    glEnableVertexAttribArray(m_Shader.m_Uv);
-    glEnableVertexAttribArray(m_Shader.m_Normal);
+
 }
 
 void ModelStd::Shutdown() const
 {
     glDeleteVertexArrays(1, &m_VAO);
     glDeleteBuffers(1, &m_VBO);
+    glDeleteBuffers(1, &m_EBO);
 }
