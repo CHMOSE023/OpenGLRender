@@ -3,9 +3,9 @@ cmake_minimum_required (VERSION 3.8)
 project ("OpenGLRender")
 
 # 搜索目录
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/") # 包含文件搜索目录
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/")            # 包含文件搜索目录
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glew-2.1.0/") # 包含文件搜索目录
-link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/deps/lib")      # 连接器搜索目录
+link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/deps/lib")                 # 连接器搜索目录
 
 # 添加编译宏
 add_compile_definitions(
@@ -32,6 +32,8 @@ set( SRC_DIRES
     "Lesson12-Animation3D"  # 12-动画基于关键帧
     "Lesson13-SkinBase"     # 13-骨骼动画节点原理
     "Lesson14-SkinModel"    # 14-播放模型中骨骼动画
+    "Lesson15-Culling"      # 15-渲染视锥体内模型
+    "Lesson16-Node"         # 16-场景节点
     
 )
 
