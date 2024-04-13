@@ -10,133 +10,88 @@ class Node
 public:
     enum    FLAG
     {
-        FLAG_UPDATE  = 1 << 0,
-        FLAG_VISIBLE = 1 << 1,
+        FLAG_UPDATE  = 1 << 0, // 0001
+        FLAG_VISIBLE = 1 << 1, // 0010
+        //0001 |= 0001  ->>  0001  1 FLAG_UPDATE 
+        //0010 |= 0001  ->>  0011  3
+        //0001 |= 0010  ->>  0011  3
+        //0010 |= 0010  ->>  0010  2 FLAG_VISIBLE                        
+        //0011 |= 0001  ->>  0011  3 
+        //0011 |= 0010  ->>  0010  3  
     };
 public:
-    Node() 
-        : m_parent(nullptr)
-        , m_scale(glm::vec3(1.0f))
-        , m_position(glm::vec3(0.0f))
-        , m_rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f))
-        , m_enabled(true), m_aabb()
-        , m_modelMatrix(1.0f) {}
-    virtual ~Node() {}
+    Node();
+     ~Node();
 
     // 设置父节点
-    void SetParent(Node* parent) { m_parent = parent; }
+    void SetParent(Node* parent);
+
     // 获取父节点
-    Node* GetParent() const { return m_parent; }
+    Node* GetParent() const;
 
     // 添加子节点
-    void AddChild(Node* child) {
-        child->SetParent(this);
-        m_children.push_back(child);
-    }
+    void AddChild(Node* child);
 
     // 移除子节点
-    void RemoveChild(Node* child) {
-        auto it = std::find(m_children.begin(), m_children.end(), child);
-        if (it != m_children.end()) {
-            (*it)->SetParent(nullptr);
-            m_children.erase(it);
-        }
-    }
+    void RemoveChild(Node* child);
 
     // 设置缩放
-    void SetScale(const glm::vec3& scale) 
-    { 
-        m_scale = scale; 
-        UpdateTransform(); 
-    }
+    void SetScale(const glm::vec3& scale);
+
     // 获取缩放
-    glm::vec3 GetScale() const { return m_scale; }
+    glm::vec3 GetScale() const;
 
     // 设置位置
-    void SetPosition(const glm::vec3& position) { m_position = position; UpdateTransform(); }
+    void SetPosition(const glm::vec3& position);
+
     // 获取位置
-    glm::vec3 GetPosition() const { return m_position; }
+    glm::vec3 GetPosition() const;
 
     // 设置旋转（四元数）
-    void SetRotation(const glm::quat& rotation) 
-    {
-        m_rotation = rotation; 
-        UpdateTransform();
-        m_flag |= FLAG_UPDATE;
-    }
+    void SetRotation(const glm::quat& rotation);
+
     // 获取旋转（四元数）
-    glm::quat GetRotation() const { return m_rotation; }
+    glm::quat GetRotation() const;
 
-    // 设置是否启用
-    void SetEnabled(bool enabled) { m_enabled = enabled; }
-    // 获取是否启用
-    bool IsEnabled() const { return m_enabled; }
+    // 是否可见
+    bool GetVisible()const;
 
+    // 设置标志为
+    void SetVisible(unsigned flag, bool );
+   
     // 设置包围盒
-    void SetAABB(const AABB& aabb) { m_aabb = aabb; }
+    void SetAABB(const AABB& aabb);
+
     // 获取包围盒
-    AABB GetAABB() const { return m_aabb; }
+    AABB GetAABB() const;
 
     // 获取节点模型矩阵
-    glm::mat4 GetModelMatrix() const { return m_modelMatrix; }
+    glm::mat4 GetModelMatrix() const;
 
     // 渲染函数（虚函数，由子类实现具体的渲染操作）
-    virtual void Render(ThirdCamera& camera, const glm::mat4& model) const
-    {
-        if (m_renderable)
-        {
-            m_renderable->Render(camera, model);
-        }
-    }
+    virtual void Render(ThirdCamera& camera, const glm::mat4& model) const;
 
-    // 更新函数（虚函数，由子类实现具体的更新操作）
-    virtual void SetRenderable(Renderable* renderable)
-    {
-        m_renderable = renderable;
-        m_aabb       = renderable->GetBound();
+    // 设置渲染对象
+    void SetRenderable(Renderable* renderable);
 
-        m_aabb.Transform(m_modelMatrix);
+    // 设置更新标志为
+    void SetUpdate(bool flag = true);
 
-        m_flag |= FLAG_UPDATE; // 按位或
-       
-    }
+    // 需要更新
+    bool NeedUpdate()const;
 
-protected:
-    // 更新变换
-    void UpdateTransform()
-    {
-        m_modelMatrix = glm::mat4(1.0f);
-        m_modelMatrix = glm::translate(m_modelMatrix, m_position);
-        m_modelMatrix *= glm::mat4_cast(m_rotation);
-        m_modelMatrix = glm::scale(m_modelMatrix, m_scale);
-
-        // 更新包围盒矩阵
-        UpdateAABBTransform();
-    }
-
+    // 更新矩阵
+    void Update(bool force = false);
     // 更新包围盒变换
-    void UpdateAABBTransform()
-    {
-        // 获取原始包围盒的最小和最大顶点
-        glm::vec3 minCorner = m_aabb.GetMinCorner();
-        glm::vec3 maxCorner = m_aabb.GetMaxCorner();
+    //void UpdateAABBTransform();
 
-        // 对原始包围盒的最小和最大顶点进行变换
-        glm::vec4 newMinCorner = m_modelMatrix * glm::vec4(minCorner, 1.0f);
-        glm::vec4 newMaxCorner = m_modelMatrix * glm::vec4(maxCorner, 1.0f);
-
-        // 更新包围盒的位置和大小
-        m_aabb = AABB(glm::vec3(newMinCorner), glm::vec3(newMaxCorner));
-    }
-
-protected:
+public:
     Node*              m_parent;           // 父节点指针
     std::vector<Node*> m_children;         // 子节点容器
 
     glm::vec3          m_scale;            // 缩放
     glm::vec3          m_position;         // 位置
-    glm::quat          m_rotation;         // 旋转（四元数）
-    bool               m_enabled;          // 是否启用
+    glm::quat          m_rotation;         // 旋转（四元数）   
     unsigned           m_flag;             // 标志位
     AABB               m_aabb;             // AABB包围盒
                        

@@ -209,11 +209,21 @@ void WinApp::Initialize(int width, int height,const char*title)
 	m_pModelStd.SetShader(m_ShaderDirLight);
 	m_pModelStd.Load("model/Box.sm.xml");
 	
+	// 100个 node 节点
+	for (int x = -50; x < 50; x += 10)
+	{
+		for (int z = -50; z < 50; z+= 10)
+		{
+			Node node;
+			node.SetPosition(glm::vec3(x, 0, z));
+			node.SetRenderable(&m_pModelStd);
+			node.Update(true);
+			m_arNodes.push_back(node);
+		}
+	}
 
 	// 启动深度缓冲
 	glEnable(GL_DEPTH_TEST);
-	
-	
 	
 	// 角色数据
 	static const Vertex vertices[6] =
@@ -247,7 +257,6 @@ void WinApp::Initialize(int width, int height,const char*title)
 	glBindVertexArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 
 
 	float   gSize = 100;
@@ -284,8 +293,6 @@ void WinApp::Initialize(int width, int height,const char*title)
 	glVertexAttribPointer(m_Shader.m_UV, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	
 	
 }
 
@@ -320,17 +327,34 @@ void WinApp::Render()
 
 	// 绘制角色
 	glBindVertexArray(m_VertexArray);
-	m_Role.Render(deltaTime, m_ThirdCamera, m_Shader, m_TextureCity, m_VertexArray, 6);
-	
+	m_Role.Render(deltaTime, m_ThirdCamera, m_Shader, m_TextureCity, m_VertexArray, 6);	
 
-	
-	
-	// 绘制模型
-	m_pModelStd.Render(m_LastFrameTime, m_ThirdCamera, m_ShaderDirLight);
-	//m_ModelStd.Render(m_LastFrameTime, m_ThirdCamera,m_ShaderDirLight);
-	
+
+	// 视锥平面
+	Frustum frustum(m_ThirdCamera.GetProject(), m_ThirdCamera.GetView());
+
+	// 绘制节点中的物体 
+	int  hasRender = 0;
+	for (size_t i = 0; i < m_arNodes.size(); ++i)
+	{
+		Node& node = m_arNodes[i];
+		//node.Update(false);
+		 
+		//frustum.IsBoundingBoxInside(node);
+		if (!frustum.IsBoundingBoxInside(node.m_aabb.GetMinCorner(), node.m_aabb.GetMaxCorner()))
+		//if (!frustum.IsPointInside(node.GetPosition()))
+		{
+			continue;
+		}
+		++hasRender;
+		node.Render(m_ThirdCamera, node.m_modelMatrix);
+	}
+	char    szBuf[128];
+	sprintf_s(szBuf, "共%d个对象，绘制了 %d \r", (int)m_arNodes.size(), hasRender);
+	printf(szBuf);
 	//  绘制地面
 	RenderGround();
+
 }
 
 void WinApp::RenderGround()

@@ -1,6 +1,6 @@
 #include "AABB.h"
 
-// 构造函数
+// 构造函数 包围盒子无限大
 AABB::AABB() 
     : m_minCorner(glm::vec3(std::numeric_limits<float>::max()))
     , m_maxCorner(glm::vec3(std::numeric_limits<float>::lowest()))

@@ -7,6 +7,8 @@
 #include "ModelStd.h"
 #include "Shader_P3_C4_T2.h"
 #include "Shader_DirLight.h"
+#include "Node.h"
+#include "Frustum.h"
 typedef struct Vertex
 {
 	glm::vec3 pos;
@@ -50,8 +52,9 @@ public:
 	double        m_Ypos;		   // 鼠标y
 	ModelStd      m_pModelStd;     // 读取外部模型文件
 
-	Shader_P3_C4_T2  m_Shader;
-	Shader_DirLight  m_ShaderDirLight;
+	Shader_P3_C4_T2     m_Shader;
+	Shader_DirLight     m_ShaderDirLight;
+	std::vector<Node>   m_arNodes;	
 
 };
 
