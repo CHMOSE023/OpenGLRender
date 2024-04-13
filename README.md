@@ -13,7 +13,7 @@ OpenGL渲染基础，以使用一个场景渲染为目标。介绍如何使用Op
 
 通过这些案例掌握OpenGL基础缓存区基础：VAO VBO EBO 、帧缓冲等内容。
 
-采用C++及CMakelist.txt应用程序工程，目前为止用到的第三方库：
+采用vs+CMakelist.txt，目前为止用到的第三方库：
 
 glm(数学库)、
 
