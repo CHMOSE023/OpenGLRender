@@ -34,6 +34,7 @@ set( SRC_DIRES
     "Lesson14-SkinModel"    # 14-播放模型中骨骼动画
     "Lesson15-Culling"      # 15-渲染视锥体内模型
     "Lesson16-Node"         # 16-场景节点
+    "Lesson17-Terrain"      # 17-灰度图地形
     
 )
 
