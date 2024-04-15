@@ -37,7 +37,7 @@ void Camera::SetEye(glm::vec3 val)
 void Camera::CalcDir()
 {
 	
-	m_dir = m_target - m_eye;      // 方向=目标位置 - 眼睛位置
+	m_dir = m_target - m_eye;      // 方向 = 目标位置 - 眼睛位置
 	m_dir = glm::normalize(m_dir); // 规格化
 }
 
@@ -71,13 +71,17 @@ glm::vec3 Camera::GetRight() const
 	return m_right;
 }
 
-void Camera::Update() 
+void Camera::Update()  
 {
-	glm::vec3 upDir   = glm::normalize(m_up);	
-	m_eye             = m_target - m_dir * m_radius;	            // 眼睛位置
-	m_right           = glm::normalize(glm::cross(m_dir, upDir));	// 眼睛位置左侧
-
-	m_matView         = glm::lookAt(m_eye, m_target, m_up); 	    // 计算视图矩阵
+	//eye  target
+	//glm::vec3 upDir   = glm::normalize(m_up);	
+	/*
+	* 1. 滚轮放大缩小 调整 距离 m_radius
+	* 2. 移动 m_target ，带着眼睛位置做
+	*/
+	//m_eye     = m_target - m_dir * m_radius;              // 眼睛位置 = 目标位置 - 观察点 * 半径（距离）
+	//m_right   = glm::normalize(glm::cross(m_dir, upDir)); // 修正向右方向 			    
+	m_matView = glm::lookAt(m_eye, m_target, m_up);       // 更新模型矩阵	    
 }
 
 void Camera::SetViewSize(const glm::vec2& viewSize)
@@ -226,8 +230,12 @@ void Camera::RotateView(float angle)
 
 inline void Camera::RotateViewY(float angle)
 {
-	m_dir        = glm::rotateY(m_dir, angle);
-	m_up         = glm::rotateY(m_up, angle);;
+	glm::mat4 mat(1);
+
+	mat = glm::rotate(angle,glm::vec3(0,1,0));
+
+	m_dir        = glm::vec4(m_dir,1) * mat;
+	m_up         = glm::vec4(m_up, 1) * mat;;
 	m_right      = normalize(glm::cross(m_dir, m_up));
 
 	float  len   = glm::length(m_eye - m_target);
@@ -238,7 +246,9 @@ inline void Camera::RotateViewY(float angle)
 
 inline void Camera::RotateViewX(float angle)
 {
+	// 沿着相机右侧 上下翻转地面
 	glm::mat4 mat(1);
+
 	mat       = glm::rotate(angle, m_right);
 
 	m_dir     = glm::vec4(m_dir,1) * mat;

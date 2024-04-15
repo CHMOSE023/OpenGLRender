@@ -42,47 +42,49 @@ glm::vec2   m_LeftDowm;
 
 void WinApp::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	WinApp* winApp = GetWindow(window);	
+	WinApp* winApp = GetWindow(window);
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-	{		
+	{
+		Ray ray = winApp->m_camera.CreateRayFromScreen(winApp->m_Xpos, winApp->m_Ypos);
+
+		glm::vec3  pos    = ray.GetOrigin();
+		float      tm     = abs((pos.y - 0) / ray.GetDirection().y);
+		glm::vec3  target = ray.PointAt(tm);
+
+		winApp->m_camera.SetTarget(target);
+
+		//_role.setTarget(float3(target.x, 0, target.z));
+
+
+		m_bLeftFlg = true;
+		m_LeftDowm = glm::vec2(winApp->m_Xpos, winApp->m_Ypos);
+
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	{
+		m_bLeftFlg = false;
 	}
 
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
 	{
-		m_bRightFlg = true;		
+		m_bRightFlg = true;
 		m_RightDowm = glm::vec2(winApp->m_Xpos, winApp->m_Ypos);
 	}
 
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
 	{
-		m_bRightFlg = false;		
+		m_bRightFlg = false;
 	}
-
-
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-	{
-		m_bLeftFlg = true;
-		m_LeftDowm = glm::vec2(winApp->m_Xpos, winApp->m_Ypos);
-		
-
-	}
-
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-	{
-		m_bLeftFlg = false;
-
-	}
-
-
 }
 
 glm::vec3 CalcIntersectPoint(Ray& ray)
 {
-	glm::vec3   pos = ray.GetOrigin();
-	float           tm = abs((pos.y) / ray.GetDirection().y);
-	glm::vec3    target = ray.PointAt(tm);
-	return  glm::vec3(target.x, 0, target.z);
+	glm::vec3    pos     = ray.GetOrigin();
+	float        tm      = abs((pos.y) / ray.GetDirection().y);
+	glm::vec3    target  = ray.PointAt(tm);
+
+	return  target;// glm::vec3(target.x, 0, target.z);
 }
 void WinApp::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -104,7 +106,33 @@ void WinApp::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos
 	// 左键平移
 	if (m_bLeftFlg)
 	{
-		// ....
+		glm::vec2 pos(xpos, ypos);
+		Ray ray0 = winApp->m_camera.CreateRayFromScreen(pos.x, pos.y);
+		Ray ray1 = winApp->m_camera.CreateRayFromScreen(m_LeftDowm.x, m_LeftDowm.y);
+		
+		// 偏移量
+		//glm::vec2 offset = glm::vec2() - m_LeftDowm;
+
+		glm::vec3 pos0 = CalcIntersectPoint(ray0);
+		glm::vec3 pos1 = CalcIntersectPoint(ray1);
+
+
+		glm::vec3 offset = pos1- pos0;
+
+		std::cout << glm::to_string(offset) << std::endl;
+		
+		m_LeftDowm = pos;
+
+		winApp->m_camera.m_eye += offset;
+		winApp->m_camera.m_target += offset;
+		//glm::vec3 newEye    =
+		//glm::vec3 newTarget =
+		//std::cout << glm::to_string(newEye) << std::endl;
+		//std::cout << glm::to_string(newTarget) << std::endl;
+		//
+		//winApp->m_camera.SetEye(newEye);
+		//winApp->m_camera.SetTarget(newTarget);
+		//winApp->m_camera.Update();
 	}
 }
 
@@ -121,8 +149,20 @@ void WinApp::WindowSizeCallback(GLFWwindow* window, int width, int height)
 void WinApp::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	WinApp* winApp = GetWindow(window);
+	// ！！调整相机与目标点距离 m_camera-> m_radius
+	double    persent = yoffset > 0 ? 1.1f : 0.9f;
+
+	Ray  ray = winApp->m_camera.CreateRayFromScreen(winApp->m_Xpos, winApp->m_Ypos);
+	glm::vec3  pos = ray.GetOrigin();
+	
+	float   tm = abs((pos.y - 0) / ray.GetDirection().y);
+	glm::vec3  center = ray.PointAt(tm);
+	center.y = 0;
+	winApp->m_camera.ScaleCameraByPos(center, persent);
+		
+	
 	if (yoffset > 0)
-	{
+	{		
 		winApp->m_camera.SetRadius(winApp->m_camera.GetRadius() * 1.2f);
 		winApp->m_camera.Update();
 	}
