@@ -6,6 +6,7 @@ project ("OpenGLRender")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/")            # 包含文件搜索目录
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glew-2.1.0/") # 包含文件搜索目录
 link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/deps/lib")                 # 连接器搜索目录
+link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/src/core")                 # 核心库
 
 # 添加编译宏
 add_compile_definitions(
@@ -18,6 +19,7 @@ set( SRC_DIRES
 	"Test02-Buffer"         # 缓冲区
 	"Test03-Nuklear"        # NuklearUI
 	"Test04-VAO"            # 测试 VAO VBO EBO
+	"Test05-Camera"         # 测试 Camera 旋转平移 
 	"Lesson01-GLFW"         # 01-使用 glfw 建立OpenGL窗口
 	"Lesson02-App"          # 02-封装窗口
     "Lesson03-Texture2D"    # 03-使用2D纹理
@@ -45,22 +47,29 @@ set(GLAD_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c"
 )
 
+# core文件
+file(GLOB CORE_SRC
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.h"  
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.cpp"  
+)
 
 # 复制textures编译目录
 file(GLOB Textures "${CMAKE_CURRENT_SOURCE_DIR}/deps/resources/*" 
                    "${CMAKE_CURRENT_SOURCE_DIR}/deps/dll/*") 
 file(COPY ${Textures} DESTINATION  ${CMAKE_CURRENT_BINARY_DIR} )
 
+message(---------->"${CORE_SRC}")
 
 # 添加glad库
 add_library(glad ${GLAD_SRC})
+add_library(core ${CORE_SRC})
 
 # 遍历src文件夹内文件，添加exe程序
 foreach(Src ${SRC_DIRES} )	
     message(${Src})
     file(GLOB SrcFile  "src/${Src}/*.h"  "src/${Src}/*.hpp"  "src/${Src}/*.cpp" "src/${Src}/*.c" )
     add_executable (${Src}  ${SrcFile} )
-    target_link_libraries(${Src} glfw3 openGL32 glad )
+    target_link_libraries(${Src} glfw3 openGL32 glad core)
 endforeach()
 
 target_link_libraries(Test03-Nuklear  glew32 )
