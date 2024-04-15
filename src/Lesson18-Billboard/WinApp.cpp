@@ -302,10 +302,12 @@ void WinApp::Render()
 
 	//  绘制角色
 	m_Role.Render(deltaTime, m_ThirdCamera, m_Shader, m_TextureCity, m_VertexArray, 6);
-	
-
-	
+		
+	// 绘制静态布告板
 	m_billboard.Render(m_ThirdCamera, m_TextureGrass1);
+	// 绘制动态布告板
+	m_billboard.Render(deltaTime,m_ThirdCamera, m_TextureGrass1);
+
 	//  绘制地面
 	RenderGround();
 
