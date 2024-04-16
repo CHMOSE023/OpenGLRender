@@ -78,7 +78,7 @@ void Camera::SetViewSize(const glm::dvec4& viewSize)
 
 void Camera::SetViewSize(double x, double y)
 {
-	m_viewSize = glm::dvec4(0,0,x, y);
+	m_viewSize = glm::dvec4(x,y,x, y);
 }
 
 glm::dvec2 Camera::GetViewSize()
@@ -240,17 +240,57 @@ void Camera::RotateViewZByCenter(double angle, glm::dvec3 pos)
 	m_matView  = glm::lookAt(m_eye, m_target, m_up);
 }
 
+
 // 创建射线
-Ray Camera::CreateRayFromScreen(int x, int y) const
+Ray Camera::CreateRayFromScreen(int mouseX, int mouseY) const
 {	
-	glm::dvec3 minWorld = glm::unProject(glm::dvec3(x, y, 0), m_matWorld, m_matProj, m_viewSize);
-	glm::dvec3 maxWorld = glm::unProject(glm::dvec3(x, y, 1), m_matWorld, m_matProj, m_viewSize);
+	//glm::dvec3 minWorld = glm::unProject(glm::dvec3(mouseX, mouseY, 0), m_matWorld, m_matProj, m_viewSize);
+	//glm::dvec3 maxWorld = glm::unProject(glm::dvec3(mouseX, mouseY, 1), m_matWorld, m_matProj, m_viewSize);
+	//
+	//Ray ray;	
+	//ray.SetOrigin(minWorld);
+	//glm::dvec3 dir(maxWorld.x - minWorld.x, maxWorld.y - minWorld.y, maxWorld.z - minWorld.z);
+	//ray.SetDirection(normalize(dir));
+
+
+
+	int width = m_viewSize.z;
+	int height = m_viewSize.w;
+
+	// 将屏幕坐标转换为标准化设备坐标 (NDC)
+	float x = (2.0f * mouseX) / width - 1.0f;
+	float y = 1.0f - (2.0f * mouseY) / height;
+
+	// 创建裁剪坐标
+	glm::vec4 clipCoords = glm::vec4(x, y, -1.0f, 1.0f);
+
+	// 创建逆投影矩阵和逆视图矩阵
+	glm::mat4 inverseProjectionMatrix = glm::inverse(m_matProj);
+	glm::mat4 inverseViewMatrix = glm::inverse(m_matView);
+
+	// 将裁剪坐标转换为视图坐标
+	glm::dvec4 eyeCoords = inverseProjectionMatrix * clipCoords;
+	eyeCoords = glm::dvec4(eyeCoords.x, eyeCoords.y, -1.0f, 0.0f); // 方向向量
+
+	// 将视图坐标转换为世界坐标
+	glm::dvec4 rayWorld = inverseViewMatrix * eyeCoords;
+	glm::dvec3 rayDirection = glm::normalize(glm::dvec3(rayWorld));
+
+	// 射线方向向量的世界坐标
+
+
+	// 计算拾取点的位置
+	glm::dvec3 cameraPosition = glm::dvec3(glm::inverse(m_matView)[3]);
+	glm::dvec3 rayOrigin = cameraPosition;
+	double distanceAlongRay = -rayOrigin.z / rayDirection.z;
+	glm::dvec3 pickPoint = rayOrigin + distanceAlongRay * rayDirection;
+
+	Ray     ray;
+	ray.SetDirection(rayDirection);
+	ray.SetOrigin(pickPoint);
+	return  ray;
+
 	
-	Ray ray;	
-	ray.SetOrigin(minWorld);
-	glm::dvec3 dir(maxWorld.x - minWorld.x, maxWorld.y - minWorld.y, maxWorld.z - minWorld.z);
-	ray.SetDirection(normalize(dir));
-	return ray;
 }
 
 void Camera::Update()
