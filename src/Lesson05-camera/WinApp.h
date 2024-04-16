@@ -2,7 +2,8 @@
 #include "Shader_P3_C4_T2.h"
 #include <GLFW/glfw3.h>
 #include "linmath.h"
-#include "FirstCamera.h"
+
+#include "../Core/CameraBase.h"
 
 typedef struct Vertex
 {
@@ -38,7 +39,7 @@ public:
 	GLuint        m_Grounds;
 	GLuint        m_TextureCity;
 	GLuint        m_TextureGrass;
-	FirstCamera   m_FirstCamera;
+	CameraBase    m_CameraBase;
 	float         m_LastFrameTime;// 记录上一帧的时间
 		
 	

@@ -94,10 +94,10 @@ void WinApp::Initialize(int width, int height,const char*title)
 		
 
 	// 初始化相机
-	m_FirstCamera.m_Eye   = glm::vec3(0.0f, 0.0f, 0.2f); // 摄像机位置
-	m_FirstCamera.m_Look  = glm::vec3(0.0f, 0.0f, 0.0f); // 观察目标位置
-	m_FirstCamera.m_Up    = glm::vec3(0.0f, 1.0f, 0.0f); // 上方向向量
-	m_FirstCamera.m_Right = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_CameraBase.m_eye   = glm::vec3(0.0f, 0.0f, 0.2f); // 摄像机位置
+	m_CameraBase.m_look  = glm::vec3(0.0f, 0.0f, 0.0f); // 观察目标位置
+	m_CameraBase.m_up    = glm::vec3(0.0f, 1.0f, 0.0f); // 上方向向量
+	m_CameraBase.m_right = glm::vec3(1.0f, 0.0f, 0.0f); // 左侧
 
 	// 记录上一帧的时间
 	m_LastFrameTime = glfwGetTime();
@@ -196,7 +196,7 @@ void WinApp::Render()
 	
 	double currentFrameTime = glfwGetTime();                // 获取当前帧的时间
 	double deltaTime = currentFrameTime - m_LastFrameTime; 	// 计算帧间隔
-	m_FirstCamera.UpdateCamera(deltaTime);                  // 更新相机
+	m_CameraBase.UpdateCamera(deltaTime);                  // 更新相机
 	m_LastFrameTime = currentFrameTime;                     // 更新上一帧时间
 
 	const float PI = 3.1415926;
@@ -204,7 +204,7 @@ void WinApp::Render()
 	float angle = glfwGetTime();
 
 	glm::mat4  world, proj, mvp;
-	glm::mat4  viewMatrix = glm::lookAt(m_FirstCamera.m_Eye, m_FirstCamera.m_Look, m_FirstCamera.m_Up);
+	glm::mat4  viewMatrix = m_CameraBase.m_view;
 
 	glm::vec3 axis(1.0f, 1.0f, 1.0f);                                   // 绕 x y z轴旋转
 	proj  = glm::perspective(glm::radians(45.0f), ratio, 0.1f, 100.0f); // 透视投影
