@@ -1,261 +1,259 @@
 #include "Camera.h"
-#include <glm/gtx/rotate_vector.hpp>
-#include <iostream>
-#include <glm/gtx/string_cast.hpp>
+
 Camera::Camera()
 {
-	m_radius    = 400;
-	m_yaw       = 0;
-	m_viewSize  = glm::vec2(100, 100);
-	m_matView   = glm::mat4(1);
-	m_matProj   = glm::mat4(1);
-	m_matWorld  = glm::mat4(1);
+	m_viewSize  = glm::dvec4(0,0,256, 256);
+	m_matView   = glm::dmat4(1);
+	m_matProj   = glm::dmat4(1);
+	m_matWorld  = glm::dmat4(1);
+	m_oldLength = glm::dvec3(10);
+
+	m_target    = glm::dvec3(0, 0, 0);
+	m_eye       = glm::dvec3(0, 100, 100);
+	m_right     = glm::dvec3(1, 0, 0);
+	m_dir       = glm::normalize(m_target - m_eye);	
+	m_up        = glm::normalize(cross(m_right, m_dir));
 }
 
 Camera::~Camera(){}
 
-float Camera::GetRadius() const
-{
-	return m_radius;
+// 相机方向
+void Camera::CalcDir()
+{  
+	m_dir = glm::normalize(m_target - m_eye); // 方向 = 目标位置 - 眼睛位置
 }
 
-void Camera::SetRadius(float val)
-{
-	m_radius = val;
-}
-
-glm::vec3 Camera::GetEye() const
-{
-	return m_eye;
-}
-
-void Camera::SetEye(glm::vec3 val)
+void Camera::SetEye(glm::dvec3 val)
 {
 	m_eye = val;
 }
 
-void Camera::CalcDir()
+
+glm::dvec3 Camera::GetEye() const
 {
-	
-	m_dir = m_target - m_eye;      // 方向 = 目标位置 - 眼睛位置
-	m_dir = glm::normalize(m_dir); // 规格化
+	return m_eye;
 }
 
-glm::vec3 Camera::GetTarget() const
-{
-	return m_target;
-}
-
-void Camera::SetTarget(glm::vec3 val)
+void Camera::SetTarget(glm::dvec3 val)
 {
 	m_target = val;
 }
 
-glm::vec3 Camera::GetUp() const
+glm::dvec3 Camera::GetTarget() const
 {
-	return m_up;
+	return m_target;
 }
 
-void Camera::SetUp(glm::vec3 val)
+
+void Camera::SetUp(glm::dvec3 val)
 {
 	m_up = val;
 }
 
-glm::vec3 Camera::GetDir() const
+glm::dvec3 Camera::GetUp() const
+{
+	return m_up;
+}
+
+
+glm::dvec3 Camera::GetDir() const
 {
 	return m_dir;
 }
 
-glm::vec3 Camera::GetRight() const
+void Camera::SetRight(glm::dvec3 val)
+{
+	m_right = val;
+}
+
+glm::dvec3 Camera::GetRight() const
 {
 	return m_right;
 }
 
-void Camera::Update()  
-{
-	//eye  target
-	//glm::vec3 upDir   = glm::normalize(m_up);	
-	/*
-	* 1. 滚轮放大缩小 调整 距离 m_radius
-	* 2. 移动 m_target ，带着眼睛位置做
-	*/
-	//m_eye     = m_target - m_dir * m_radius;              // 眼睛位置 = 目标位置 - 观察点 * 半径（距离）
-	//m_right   = glm::normalize(glm::cross(m_dir, upDir)); // 修正向右方向 			    
-	m_matView = glm::lookAt(m_eye, m_target, m_up);       // 更新模型矩阵	    
-}
-
-void Camera::SetViewSize(const glm::vec2& viewSize)
+void Camera::SetViewSize(const glm::dvec4& viewSize)
 {
 	m_viewSize = viewSize;
 }
 
-void Camera::SetViewSize(float x, float y)
+void Camera::SetViewSize(double x, double y)
 {
-	m_viewSize = glm::vec2(x,y);
+	m_viewSize = glm::dvec4(0,0,x, y);
 }
 
-glm::vec2 Camera::GetViewSize()
+glm::dvec2 Camera::GetViewSize()
 {
 	return m_viewSize;
 }
 
-void Camera::Ortho(float left, float right, float bottom, float top, float zNear, float zFar)
-{
-	m_matProj = glm::ortho(left, right, bottom, top, zNear, zFar);
-}
-
-void Camera::SetProject(const glm::mat4& proj)
+void Camera::SetProject(const glm::dmat4& proj)
 {
 	m_matProj = proj;
 }
 
-const glm::mat4& Camera::GetProject() const
-{
-	// TODO: 在此处插入 return 语句
-	return m_matProj;
-}
 
-const glm::mat4& Camera::GetView() const
+const glm::dmat4& Camera::GetView() const
 {
 	return m_matView;
 }
 
-void Camera::Perspective(float fovy, float aspect, float zNear, float zFar)
+const glm::dmat4& Camera::GetProject() const
+{
+	return m_matProj;
+}
+
+void Camera::Ortho(double left, double right, double bottom, double top, double zNear, double zFar)
+{
+	m_matProj = glm::ortho(left, right, bottom, top, zNear, zFar);
+}
+
+
+void Camera::Perspective(double fovy, double aspect, double zNear, double zFar)
 {
 	m_matProj = glm::perspective(fovy, aspect, zNear, zFar);
 }
 
-// 世界坐标转化为窗口坐标
-bool Camera::Project(const glm::vec4& world, glm::vec4& screen)const
-{
-	screen = (m_matProj * m_matView * m_matWorld) * world;
-	if (screen.w == 0.0f)
-	{
-		return false;
-	}
-	screen.x /= screen.w;
-	screen.y /= screen.w;
-	screen.z /= screen.w;
 
-	// map to range 0 - 1
-	screen.x = screen.x * 0.5f + 0.5f;
-	screen.y = screen.y * 0.5f + 0.5f;
-	screen.z = screen.z * 0.5f + 0.5f;
-
-	// map to viewport
-	screen.x = screen.x * m_viewSize.x;
-	screen.y = m_viewSize.y - (screen.y * m_viewSize.y);
-	return  true;
-
-}
-
-// 世界坐标转化为窗口坐标
-glm::vec2 Camera::WordToScreen(const glm::vec3& world)const
-{
-	glm::vec4 worlds(world.x, world.y, world.z, 1);
-	glm::vec4 screens;
-	Project(worlds, screens);
-	return glm::vec2(screens.x, screens.y);
-}
-
-//  窗口坐标转化为世界坐标
-glm::vec3 Camera::ScreenToWorld(const glm::vec2& screen)const
-{
-	glm::vec4  screens(screen.x, screen.y, 0, 1);
-	glm::vec4  world;
-	UnProject(screens, world);	
-
-	return glm::vec3(world.x, world.y, world.z);
-}
-
-
-// 屏幕坐标转换为世界坐标
-glm::vec3 Camera::ScreenToWorld(double mouseX, double mouseY)const
-{
-	int width  = m_viewSize.x;
-	int height = m_viewSize.y;	
-
-	// 将屏幕坐标转换为标准化设备坐标 (NDC)
-	float x = (2.0f * mouseX) / width - 1.0f;
-	float y = 1.0f - (2.0f * mouseY) / height;
-
-	// 创建裁剪坐标
-	glm::vec4 clipCoords = glm::vec4(x, y, -1.0f, 1.0f);
-	
-	// 创建逆投影矩阵和逆视图矩阵
-	glm::mat4 inverseProjectionMatrix = glm::inverse(m_matProj);
-	glm::mat4 inverseViewMatrix = glm::inverse(m_matView);
-
-	// 将裁剪坐标转换为视图坐标
-	glm::vec4 eyeCoords = inverseProjectionMatrix * clipCoords;
-	eyeCoords = glm::vec4(eyeCoords.x, eyeCoords.y, -1.0f, 0.0f); // 方向向量
-
-	// 将视图坐标转换为世界坐标
-	glm::vec4 rayWorld = inverseViewMatrix * eyeCoords;
-	glm::vec3 rayDirection = glm::normalize(glm::vec3(rayWorld));
-
-	return rayDirection;
-}
-
-
-
-//  窗口坐标转换为世界坐标
-bool Camera::UnProject(const glm::vec4& screen, glm::vec4& world)const
-{
-
-	return true;
-}
-
-Ray Camera::CreateRayFromScreen(int x, int y) const
-{
-	// 射线方向向量的世界坐标
-	glm::vec3 rayDirection = ScreenToWorld(x, y);
-
-	// 计算拾取点的位置
-	glm::vec3 cameraPosition = glm::vec3(glm::inverse(m_matView)[3]);
-	glm::vec3 rayOrigin = cameraPosition;
-	float distanceAlongRay = -rayOrigin.z / rayDirection.z;
-	glm::vec3 pickPoint = rayOrigin + distanceAlongRay * rayDirection;
-
-	Ray     ray1;
-	ray1.SetDirection(rayDirection);
-	ray1.SetOrigin(pickPoint);
-	return  ray1;
-}
-
-void Camera::RotateView(float angle)
-{
-	m_dir = glm::rotateY(m_dir,angle);
-}
-
-inline void Camera::RotateViewY(float angle)
-{
-	glm::mat4 mat(1);
-
-	mat = glm::rotate(angle,glm::vec3(0,1,0));
-
-	m_dir        = glm::vec4(m_dir,1) * mat;
-	m_up         = glm::vec4(m_up, 1) * mat;;
-	m_right      = normalize(glm::cross(m_dir, m_up));
-
-	float  len   = glm::length(m_eye - m_target);
-	m_eye        = m_target - m_dir * len;
-
-	m_matView    = glm::lookAt(m_eye, m_target, m_up);
-}
-
-inline void Camera::RotateViewX(float angle)
+void Camera::RotateViewX(double angle)
 {
 	// 沿着相机右侧 上下翻转地面
-	glm::mat4 mat(1);
+	glm::dmat4 mat(1);
 
-	mat       = glm::rotate(angle, m_right);
+	mat = glm::rotate(angle, m_right);
 
-	m_dir     = glm::vec4(m_dir,1) * mat;
-	m_up      = glm::vec4(m_up, 1) * mat;
-	m_right   = normalize(glm::cross(m_dir, m_up));
-	float len = glm::length(m_eye - m_target);
-	m_eye     = m_target - m_dir * len;
+	m_dir       = glm::dvec4(m_dir, 1) * mat;
+	m_up        = glm::dvec4(m_up, 1) * mat;
+	m_right     = normalize(glm::cross(m_dir, m_up));
+	double len  = glm::length(m_eye - m_target);
+	m_eye       = m_target - m_dir * len;
+	m_matView   = glm::lookAt(m_eye, m_target, m_up);
+}
+
+
+void Camera::RotateViewY(double angle)
+{
+	glm::dmat4 mat(1);
+
+	mat         = glm::rotate(angle, glm::dvec3(0, 1, 0));
+	m_dir       = glm::vec4(m_dir, 1) * mat;
+	m_up        = glm::vec4(m_up, 1) * mat;;
+	m_right     = normalize(glm::cross(m_dir, m_up));
+	double  len = glm::length(m_eye - m_target);
+	m_eye       = m_target - m_dir * len;
+	m_matView   = glm::lookAt(m_eye, m_target, m_up);
+}
+
+
+
+#include<iostream>
+// 指定点推进摄像机
+void Camera::ScaleCameraByPos(const glm::dvec3& pos, double persent)
+{	
+
+	glm::dvec3 dir    = glm::normalize(pos - m_eye);
+
+	double dis        = glm::length(pos - m_eye) * persent;
+	
+	double disCam     = glm::length(m_target - m_eye) * persent;	
+
+
+	glm::dvec3 dirCam = glm::normalize(m_target - m_eye);
+
+	m_eye    = pos - dir * dis;
+
+	m_target = m_eye + dirCam * disCam;
+
+	Update();
+}
+
+void Camera::RotateViewXByCenter(double angle, glm::dvec3 pos)
+{	 
+	//! 计算眼睛到鼠标点的方向
+	glm::dvec3   vDir = pos - m_eye;
+	/// 计算旋转点和眼睛之间的距离
+	double       len1 = glm::length(vDir);
+	/// 旋转点和眼睛直接的方向
+	         vDir = normalize(vDir);
+	double   len  = 0;
+
+	glm::dmat4 mat(1);
+	mat = glm::rotate(mat, angle, m_right);
+
+	vDir = glm::dvec4(vDir,1) * mat;
+
+	/// 推倒出眼睛的位置
+	m_eye = pos - vDir * len1;
+
+	m_dir = glm::dvec4(m_dir, 1) * mat;
+	m_up  = glm::dvec4(m_up , 1) * mat;
+
+	m_right = glm::normalize(glm::cross(m_dir, m_up));
+
+	len = glm::length(m_eye - m_target);
+	/// 推导出观察中心点的位置
+	m_target = m_eye + m_dir * len;
 
 	m_matView = glm::lookAt(m_eye, m_target, m_up);
+}	 
+void Camera::RotateViewYByCenter(double angle, glm::dvec3 pos)
+{	 
+	double        len(0);
+	double        len1(0);
+	glm::dmat4    mat(1);
+
+	mat = glm::rotate(mat, angle, glm::dvec3(0, 1, 0));
+
+	glm::dvec3   vDir = pos - m_eye;
+
+	len1  = glm::length(vDir);
+	vDir  = glm::normalize(vDir);
+	vDir  = glm::dvec4(vDir,1.0) * mat;
+	m_eye = pos - vDir * len1;
+
+	m_dir     = glm::dvec4(m_dir,1.0) * mat;
+	m_up      = glm::dvec4(m_up, 1.0) * mat;
+	m_right   = glm::normalize(glm::cross(m_dir, m_up));
+	len       = glm::length(m_eye - m_target);
+	m_target  = m_eye + m_dir * len;
+	m_matView = glm::lookAt(m_eye, m_target, m_up);
+}	 
+void Camera::RotateViewZByCenter(double angle, glm::dvec3 pos)
+{
+	double        len(0);
+	double        len1(0);
+	glm::dmat4    mat(1);
+
+	mat = glm::rotate(mat, angle, glm::dvec3(0, 0, 1));
+	
+	glm::dvec3   vDir = pos - m_eye;
+	
+	len1       = glm::length(vDir);
+	vDir       = glm::normalize(vDir);
+	vDir       = glm::dvec4(vDir, 1.0) * mat;
+	m_eye      = pos - vDir * len1;
+
+	m_dir      = glm::dvec4(m_dir, 1.0) * mat;
+	m_up       = glm::dvec4(m_up, 1.0) * mat;
+	m_right    = glm::normalize(glm::cross(m_dir, m_up));
+	len        = glm::length(m_eye - m_target);
+	m_target   = m_eye + m_dir * len;
+	m_matView  = glm::lookAt(m_eye, m_target, m_up);
+}
+
+// 创建射线
+Ray Camera::CreateRayFromScreen(int x, int y) const
+{	
+	glm::dvec3 minWorld = glm::unProject(glm::dvec3(x, y, 0), m_matWorld, m_matProj, m_viewSize);
+	glm::dvec3 maxWorld = glm::unProject(glm::dvec3(x, y, 1), m_matWorld, m_matProj, m_viewSize);
+	
+	Ray ray;	
+	ray.SetOrigin(minWorld);
+	glm::dvec3 dir(maxWorld.x - minWorld.x, maxWorld.y - minWorld.y, maxWorld.z - minWorld.z);
+	ray.SetDirection(normalize(dir));
+	return ray;
+}
+
+void Camera::Update()
+{
+	m_matView = glm::lookAt(m_eye, m_target, m_up);         // 更新模型矩阵	
 }

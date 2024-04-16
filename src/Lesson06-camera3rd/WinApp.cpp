@@ -200,10 +200,10 @@ void WinApp::Initialize(int width, int height,const char*title)
 	m_ThirdCamera.SetRadius(50.0f);
 	m_ThirdCamera.SetViewSize(m_Width, m_Height);
 	m_ThirdCamera.Perspective(45.0f, float(width) / float(height), 0.1f, 100000.0f);
+	m_ThirdCamera.SetUp(glm::vec3(0,1.0f,0));	
 	m_ThirdCamera.SetEye(glm::vec3(50, 50, 50));
 	m_ThirdCamera.SetTarget(m_Role.m_Position);
 	m_ThirdCamera.CalcDir();
-	m_ThirdCamera.SetUp(glm::vec3(0,1.0f,0));	
 	m_ThirdCamera.Update();
 
 	// …Ë÷√Ω«…´Œª÷√

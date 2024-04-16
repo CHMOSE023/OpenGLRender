@@ -3,75 +3,63 @@
 #include "linmath.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include "Ray.h"
 /// <summary>
 /// 摄像机
 /// </summary>
 class Camera
 {
-public:
-	Camera();
+public:	
+	 Camera();	
 	~Camera();
 public:
-	float      GetRadius() const;	  
-	void       SetRadius(float val);    // 设置中心点与眼睛的距离
-	glm::vec3  GetEye() const;          
-	void       SetEye(glm::vec3 val);   // 设置眼睛的位置
-	void       CalcDir();               // 计算观察方向
-	glm::vec3  GetTarget() const;     
-	void       SetTarget(glm::vec3 val); // 设置目标点
-	glm::vec3  GetUp() const;
-	void       SetUp(glm::vec3 val) ;    // 设置向上方向
-	glm::vec3  GetDir() const;
-	glm::vec3  GetRight() const;
-	void       Update() ;                // 每帧更新生成新观察矩阵 lookAt()
-	void       SetViewSize(const glm::vec2& viewSize);
-	void       SetViewSize(float x, float y);
-	glm::vec2  GetViewSize();
-	void       Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
-	void       SetProject(const glm::mat4& proj);
-	const      glm::mat4& GetProject() const;
-	const      glm::mat4& GetView() const;
-	void       Perspective(float fovy, float aspect, float zNear, float zFar);       // 透视
-	bool       Project(const glm::vec4& world, glm::vec4& screen)const;              // 世界坐标转化为窗口坐标
-	glm::vec2  WordToScreen(const glm::vec3& world)const;                            // 世界坐标转化为窗口坐标
-	glm::vec3  ScreenToWorld(const glm::vec2& screen)const;                          // 窗口坐标转化为世界坐标
-	glm::vec3  ScreenToWorld(double mouseX, double mouseY)const;
-	bool       UnProject(const glm::vec4& screen, glm::vec4& world)const;
-	Ray        CreateRayFromScreen(int x, int y)const;
-	void       RotateView(float angle);                                              // 观察方向绕某个方向轴旋转一定的角度 
-	
-	void ScaleCameraByPos(const glm::vec3& pos, float persent)
-	{
-		glm::vec3 dir = glm::normalize(pos - m_eye);
+	void        CalcDir();               // 计算观察方向
+	glm::dvec3  GetEye() const;          
+	void        SetEye(glm::dvec3 val);   // 设置眼睛的位置
+	glm::dvec3  GetTarget() const;     
+	void        SetTarget(glm::dvec3 val); // 设置目标点
+	glm::dvec3  GetUp() const;
+	void        SetUp(glm::dvec3 val) ;    // 设置向上方向
+	glm::dvec3  GetDir() const;
+	void        SetRight(glm::dvec3 val);
+	glm::dvec3  GetRight() const;	
+	void        SetViewSize(const glm::dvec4& viewSize);
+	void        SetViewSize(double x, double y);
+	glm::dvec2  GetViewSize();
+	void        SetProject(const glm::dmat4& proj);
+	const glm::dmat4& GetView()const;
+	const glm::dmat4& GetProject()const;
+	void        Ortho(double left, double right, double bottom, double top, double zNear, double zFar); // 正交投影
+	void        Perspective(double fovy, double aspect, double zNear, double zFar);                     // 透视投影
 
-		float dis = glm::length(pos - m_eye) * persent;
+	/**
+	*   下面的函数的功能是将摄像机的观察方向绕某个方向轴旋转一定的角度改变观察者的位置，目标的位置不变化
+	*/
+	void       RotateViewX(double angle);
+	void       RotateViewY(double angle);
+	void       RotateViewXByCenter(double angle,glm::dvec3 pos);
+	void       RotateViewYByCenter(double angle,glm::dvec3 pos);
+	void       RotateViewZByCenter(double angle,glm::dvec3 pos);
+	void       ScaleCameraByPos(const glm::dvec3& pos, double persent); // 指定点推进摄像机
 
-		float disCam = glm::length(m_target - m_eye) * persent;
+	Ray        CreateRayFromScreen(int x, int y)const;                  // 产生一条射线  
 
-		glm::vec3 dirCam = glm::normalize(m_target - m_eye);
-
-		m_eye = pos - dir * dis;
-		m_target = m_eye + dirCam * disCam;
-
-		Update();
-	};
-	virtual void  RotateViewY(float angle);
-	virtual void  RotateViewX(float angle);
+	void       Update();                              
 
 public:	
 	
-	glm::vec3  m_eye;		// 眼睛位置
-	glm::vec3  m_up;		// 向上位置
-	glm::vec3  m_right;		// 朝右位置 
-	glm::vec3  m_target;	// 中心点
-	float      m_radius;	// 中心点与眼睛的距离  (！！！滚轮调整远近)
-	glm::vec3  m_dir;		// 观察点  
-	glm::mat4  m_matView;	// 观察矩阵
-	glm::mat4  m_matProj;	// 投影矩阵（便于管理加入）
-	glm::mat4  m_matWorld;	// 世界矩阵（单位矩阵）
+	glm::dvec3  m_eye;		// 眼睛位置
+	glm::dvec3  m_up;		// 向上位置
+	glm::dvec3  m_right;	// 朝右位置 
+	glm::dvec3  m_target;	// 中心点
+	glm::dvec3  m_dir;		// 观察方向  
+	glm::dmat4  m_matView;	// 观察矩阵
+	glm::dmat4  m_matProj;	// 投影矩阵（便于管理加入）
+	glm::dmat4  m_matWorld;	// 世界矩阵（单位矩阵）
 
-	glm::vec2  m_viewSize;	// 视口大小（屏幕坐标与世界坐标之间转换时候用到）
+	glm::dvec4  m_viewSize;	// 视口大小（屏幕坐标与世界坐标之间转换时候用到）
 
-	float      m_yaw;		// 旋转角度
+	glm::dvec3  m_oldLength;	
 };

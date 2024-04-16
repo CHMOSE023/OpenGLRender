@@ -2,10 +2,10 @@
 #include "WinApp.h"
 int main(void)
 {
-	printf("Lesson18-Billboard\n");
+	printf("Test05-Camera\n");
 	
 	WinApp  app;
-	app.Initialize(800,600,"Lesson18-Billboard");
+	app.Initialize(800,600,"Test05-Camera");
 	app.Run();
    
 }
