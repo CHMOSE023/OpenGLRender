@@ -128,7 +128,7 @@ void WinApp::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos
 		//std::cout << "pos1" << glm::to_string(pos1) << std::endl;
 		//std::cout << "pos1" << glm::to_string(pos1) << std::endl;
 
-		std::cout << glm::to_string(offset3) << std::endl;
+		//std::cout << glm::to_string(offset3) << std::endl;
 		
 		//offset3 *= 100;
 		
@@ -136,15 +136,26 @@ void WinApp::CursorPositionCallback(GLFWwindow* window, double xpos, double ypos
 		//
 		glm::dvec3  newEye = winApp->m_camera.GetEye()    + offset3 * 0.3;
 		glm::dvec3  newTgt = winApp->m_camera.GetTarget() + offset3 * 0.3;
-		//
+		
+		// 限制旋转相机 Y轴 上下调整高度
+		if (newEye.y > 100 || newEye.y < -10)
+		{
+			return;
+		}
+	
+
 		winApp->m_camera.SetEye(newEye);
 		winApp->m_camera.SetTarget(newTgt);
+		// 修正向上
+		//winApp->m_camera.SetUp(glm::cross(winApp->m_camera.GetRight(),glm::normalize(newTgt- newEye) ));
+		std::cout << "Right" << glm::to_string(winApp->m_camera.GetRight()) << std::endl;
 		
+		// winApp->m_camera.SetUp(glm::dvec3(0, 1, 0));
 		
 		//std::cout <<"Eye" <<glm::to_string(winApp->m_camera.GetEye()) << std::endl;
 		//std::cout <<"tgt" <<glm::to_string(winApp->m_camera.GetTarget()) << std::endl;
-		std::cout <<"newEye" <<glm::to_string(newEye) << std::endl;
-		std::cout <<"newTgt" <<glm::to_string(newTgt) << std::endl;
+		 //std::cout <<"newEye" <<glm::to_string(newEye) << std::endl;
+		// std::cout <<"newTgt" <<glm::to_string(newTgt) << std::endl;
 		winApp->m_camera.Update();
 
 
@@ -157,7 +168,7 @@ void WinApp::WindowSizeCallback(GLFWwindow* window, int width, int height)
 	winApp->m_Height = height;
 	winApp->m_Width  = width;
 
-	winApp->m_camera.Perspective(45.0f, float(width) / float(height), 0.1f, 5000.0f);
+	winApp->m_camera.Perspective(45.0f, float(width) / float(height), 0.1f, 500.0f);
 	winApp->m_camera.SetViewSize(float(width), float(height));
 }
 
@@ -293,7 +304,7 @@ void WinApp::Initialize(int width, int height,const char*title)
 	m_camera.CalcDir();
 
 	m_camera.SetViewSize(m_Width, m_Height);
-	m_camera.Perspective(45.0f, float(width) / float(height), 0.1f, 5000.0f);
+	m_camera.Perspective(45.0f, float(width) / float(height), 0.1f, 500.0f);
 	
 	m_camera.Update();
 	
