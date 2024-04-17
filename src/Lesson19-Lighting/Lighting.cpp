@@ -1,5 +1,6 @@
-#include"../Core/Application.h"
-
+#include "../Core/Application.h"
+#include "../Entity/Ground.h"
+#include "../Core/Camera.h"
 #define APPLICTION "Lesson19-Lighting"
 
 class LighingApp :public Application
@@ -7,23 +8,30 @@ class LighingApp :public Application
 
 	// 1.准备数据
 	virtual void Startup() 
-	{
-		printf("1.准备数据\n");
+	{		
+		m_ground.Init();
+		//m_camera.SetEye();
+		
 	}
 
 	// 2.渲染数据
 	virtual void Render()
 	{
-		printf("2.渲染帧率: %d\n" ,m_franerNuber);
+		glm::mat4 mat1(1);
+
+		m_ground.Render(mat1);
+
 	}
 	// 3.关闭
 	virtual void Shutdown()
 	{
-		printf("3.关闭\n");
+		
 	}
 
-private: 	// 变量
+private: // 变量
 
+	Ground m_ground; // 地面
+	Camera m_camera;
 };
 
 int main()

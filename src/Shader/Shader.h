@@ -14,6 +14,6 @@ public:
 	virtual void End();
 
 public:
-	int  m_ShaderId;
+	int  m_shaderId;
 };
 

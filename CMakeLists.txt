@@ -6,7 +6,7 @@ project ("OpenGLRender")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/")            # 包含文件搜索目录
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glew-2.1.0/") # 包含文件搜索目录
 link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/deps/lib")                 # 连接器搜索目录
-link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/src/core")                 # 核心库
+#link_directories   ("${CMAKE_CURRENT_SOURCE_DIR}/src/core")                 # 核心库
 
 # 添加编译宏
 add_compile_definitions(
@@ -48,10 +48,12 @@ set(GLAD_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/include/glad/glad.c"
 )
 
-# core文件
+# 框架文件
 file(GLOB CORE_SRC
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.h"  
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/core/*.cpp"  
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/core/*"   
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/Shader/*"  
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/Entity/*"  
+ 
 )
 
 # 复制textures编译目录

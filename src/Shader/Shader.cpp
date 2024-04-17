@@ -1,6 +1,6 @@
 #include "Shader.h"
 
-Shader::Shader():m_ShaderId(0)
+Shader::Shader():m_shaderId(0)
 {
 }
 
@@ -52,29 +52,29 @@ bool Shader::CreateShader(const char* vertex, const char* fragment)
 				break;
 			}
 		}
-		m_ShaderId = glCreateProgram();
+		m_shaderId = glCreateProgram();
 
 		if (vertexShader)
 		{
-			glAttachShader(m_ShaderId, vertexShader);
+			glAttachShader(m_shaderId, vertexShader);
 		}
 
 		if (fragmentShader)
 		{
-			glAttachShader(m_ShaderId, fragmentShader);
+			glAttachShader(m_shaderId, fragmentShader);
 		}
 
-		glLinkProgram(m_ShaderId);
+		glLinkProgram(m_shaderId);
 
 		GLint linkStatus;
-		glGetProgramiv(m_ShaderId, GL_LINK_STATUS, &linkStatus);
+		glGetProgramiv(m_shaderId, GL_LINK_STATUS, &linkStatus);
 		if (linkStatus == GL_FALSE)
 		{
 			GLchar messages[256];
-			glGetProgramInfoLog(m_ShaderId, sizeof(messages), 0, messages);
+			glGetProgramInfoLog(m_shaderId, sizeof(messages), 0, messages);
 			break;
 		}
-		glUseProgram(m_ShaderId);
+		glUseProgram(m_shaderId);
 
 	} while (false);
 
@@ -90,10 +90,10 @@ bool Shader::CreateShader(const char* vertex, const char* fragment)
 			glDeleteShader(vertexShader);
 			vertexShader = 0;
 		}
-		if (m_ShaderId)
+		if (m_shaderId)
 		{
-			glDeleteProgram(m_ShaderId);
-			m_ShaderId = 0;
+			glDeleteProgram(m_shaderId);
+			m_shaderId = 0;
 		}
 	}
 
@@ -102,7 +102,7 @@ bool Shader::CreateShader(const char* vertex, const char* fragment)
 
 void Shader::Begin()
 {
-	glUseProgram(m_ShaderId);
+	glUseProgram(m_shaderId);
 
 }
 
