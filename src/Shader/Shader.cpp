@@ -6,6 +6,8 @@ Shader::Shader():m_shaderId(0)
 
 Shader::~Shader()
 {
+	// É¾³ýshader
+	glDeleteProgram(m_shaderId);
 }
 
 bool Shader::CreateShader(const char* vertex, const char* fragment)

@@ -60,11 +60,13 @@ public:
        
         if (res)
         {
-           m_mvp       = glGetUniformLocation(m_shaderId, "MVP");
-           m_position  = glGetUniformLocation(m_shaderId, "texture");
-           m_color     = glGetAttribLocation (m_shaderId, "aPos");
-           m_uv        = glGetAttribLocation (m_shaderId, "aColor");
-           m_texture   = glGetAttribLocation (m_shaderId, "aTexCoord");
+            m_mvp       = glGetUniformLocation(m_shaderId, "MVP");
+            m_texture   = glGetUniformLocation(m_shaderId, "texture");
+            m_position  = glGetAttribLocation(m_shaderId, "aPos");
+            m_color     = glGetAttribLocation(m_shaderId, "aColor");
+            m_uv        = glGetAttribLocation(m_shaderId, "aTexCoord");
+
+         
         }	
 
         return res;
