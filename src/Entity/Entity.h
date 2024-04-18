@@ -5,6 +5,6 @@ class Entity
 public:
 	Entity() {};
 	virtual ~Entity() {}; 
-	void Render() {};
+	virtual void Render(const Camera& camera) = 0; // 纯虚函数继承类必须实现
 
 };
