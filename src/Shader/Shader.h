@@ -35,6 +35,11 @@ public:
         glUniformMatrix4fv(cit->second, 1, GL_FALSE, glm::value_ptr(mat));
     }
 
+    void SetFloat(const std::string& name, const float x) const
+    {
+        auto cit = uniform.find(name);
+        glUniform1f(cit->second, x);
+    }
 public:
 	int  m_shaderId;
 
