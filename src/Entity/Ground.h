@@ -31,9 +31,9 @@ public:
 		 } Vertex;
 
 
-		 float   gSize = 100;
-		 float   gPos = -5;
-		 float   rept = 10;
+		 float   gSize = 10;
+		 float   gPos = -1;
+		 float   rept = 15;
 
 		 // 绘制地面数据	
 		 static const Vertex grounds[6] =
