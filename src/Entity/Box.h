@@ -8,6 +8,11 @@ class Box :public Entity
 private:    
 	GLuint m_programID;
 	GLuint m_vao, m_vbo, m_ebo;
+
+    GLuint m_uniformModel;
+    GLuint m_uniformView;
+    GLuint m_uniformProjection;
+    
 public:
     Box()
     {
@@ -15,6 +20,10 @@ public:
         m_vao = -1;
         m_vbo = -1;
         m_ebo = -1;
+
+        m_uniformModel = -1;
+        m_uniformView = -1;
+        m_uniformProjection = -1;
     };
 	~Box()
     {
@@ -61,6 +70,10 @@ public:
         glDeleteShader(fragmentShaderID);
 
 
+        // 每次调用 glGetUniformLocation 增加cpu 开销。 
+        m_uniformModel      = glGetUniformLocation(m_programID, "model");
+        m_uniformView       = glGetUniformLocation(m_programID, "view");
+        m_uniformProjection = glGetUniformLocation(m_programID, "projection"); //    顶点启用后才能查到值
 
         GLfloat vertices[] = {
             // 顶点坐标           // 颜色
@@ -89,6 +102,7 @@ public:
             4, 1, 0
         };
 
+        int a=1;
 
         glGenVertexArrays(1, &m_vao);
         glGenBuffers(1, &m_vbo);
@@ -118,22 +132,19 @@ public:
         glm::mat4 model(1.0f);
         glm::mat4 view = camera.GetView();
         glm::mat4 projection = camera.GetProject();
-        //
+   
         GLfloat currentTime = glfwGetTime();
         model = glm::mat4(1);
         model = glm::translate(model, glm::vec3(-3.0, 0, 0));
         model = glm::rotate(model, glm::radians(50.0f) * currentTime, glm::vec3(0.5f, 1.0f, 0.0f));
 
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+     
 
         glUseProgram(m_programID);
 
-        GLuint modelLoc = glGetUniformLocation(m_programID, "model");
-        GLuint viewLoc = glGetUniformLocation(m_programID, "view");
-        GLuint projectionLoc = glGetUniformLocation(m_programID, "projection");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(m_uniformModel,      1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(m_uniformView,       1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(m_uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
         glBindVertexArray(m_vao);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
