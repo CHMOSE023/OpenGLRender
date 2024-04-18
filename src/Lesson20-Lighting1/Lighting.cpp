@@ -4,6 +4,7 @@
 #include "iostream"
 #include "../Entity/Box.h"
 #include "BoxColorLighting.h"
+#include "ShaderCube.h"
 
 #define APPLICTION "Lesson19-Lighting"
 
@@ -42,7 +43,7 @@ class LighingApp :public Application
 		 m_box.Render(m_camera);
        
 
-		 printf("%d\r\n", m_franerNuber);
+		// printf("%d\r\n", m_franerNuber);
 
 
 	}
@@ -76,6 +77,6 @@ private: // ±‰¡ø
 int main()
 {
 	LighingApp lighingApp;	
-	lighingApp.Initialize(1920 * 1, 1080 * 1, APPLICTION);
+	lighingApp.Initialize(1920 * 0.5, 1080 * 0.5, APPLICTION);
 	lighingApp.Run();
 }
