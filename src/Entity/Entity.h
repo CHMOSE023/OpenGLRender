@@ -1,5 +1,6 @@
 #pragma once
 #include "../Shader/Shader.h"
+#include "../Core/Camera.h"
 class Entity
 {
 public:
