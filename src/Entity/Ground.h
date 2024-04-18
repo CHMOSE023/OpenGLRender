@@ -33,7 +33,7 @@ public:
 
 		 float   gSize = 100;
 		 float   gPos = -5;
-		 float   rept = 20;
+		 float   rept = 10;
 
 		 // 绘制地面数据	
 		 static const Vertex grounds[6] =
