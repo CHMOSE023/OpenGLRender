@@ -26,7 +26,9 @@ public:
             void main()
             {
                 FragPos = vec3(model * vec4(aPos, 1.0));
-                Normal = mat3(transpose(inverse(model))) * aNormal;  
+                
+                // Normal 法线矩阵  可以从cpu计算好传入。
+                Normal  = mat3(transpose(inverse(model))) * aNormal; // 3×3矩阵，来保证它失去了位移属性以及能够乘以vec3的法向量
                 
                 gl_Position = projection * view * vec4(FragPos, 1.0);
             }
@@ -46,22 +48,26 @@ public:
             
             void main()
             {
-                // ambient
+                // ambient 环境光照 Ambient Lighting
+
                 float ambientStrength = 0.1;
-                vec3 ambient = ambientStrength * lightColor;
-              	
-                // diffuse 
-                vec3 norm = normalize(Normal);
-                vec3 lightDir = normalize(lightPos - FragPos);
-                float diff = max(dot(norm, lightDir), 0.0);
-                vec3 diffuse = diff * lightColor;
+                vec3  ambient         = ambientStrength * lightColor;               
+
+                // diffuse  漫反射光照 Diffuse Lighting
+
+                vec3  norm     = normalize(Normal);             // 法向量标准化
+                vec3  lightDir = normalize(lightPos - FragPos); // 标准化 计算向量差
+                float diff     = max(dot(norm, lightDir), 0.0); // norm和lightDir向量进行点乘 ，两个向量之间的角度越大，漫反射分量就会越小
+                vec3  diffuse  = diff * lightColor;             // ！！！缺少法线矩阵计算 变形后失真
                 
-                // specular
-                float specularStrength = 0.5;
-                vec3 viewDir = normalize(viewPos - FragPos);
-                vec3 reflectDir = reflect(-lightDir, norm);  
-                float spec = pow(max(dot(viewDir, reflectDir), 0.0), 50); 
-                vec3 specular = specularStrength * spec * lightColor;  
+                // specular 镜面光照(Specular Lighting)
+
+                float specularStrength = 0.5;                    // 镜面强度(Specular Intensity)变量
+
+                vec3  viewDir    = normalize(viewPos - FragPos); // 计算视线方向向量
+                vec3  reflectDir = reflect(-lightDir, norm);     // 法线轴的反射向量
+                float spec       = pow(max(dot(viewDir, reflectDir), 0.0), 50); 
+                vec3  specular   = specularStrength * spec * lightColor;  
                     
                 vec3 result = (ambient + diffuse + specular) * objectColor;
                 FragColor = vec4(result, 1.0);
