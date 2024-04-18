@@ -192,8 +192,8 @@ void Application::Initialize(int width, int height, const char* title)
 
 	// 设置第相机	
 
-	m_camera.SetTarget(glm::dvec3(0, 0, -50));
-	m_camera.SetEye(glm::dvec3(0, 50, 0));
+	m_camera.SetEye(glm::dvec3(0, 0, 5));
+	m_camera.SetTarget(glm::dvec3(0, 0, 0));
 	m_camera.SetRight(glm::dvec3(1, 0, 0));
 	m_camera.CalcDir();
 
