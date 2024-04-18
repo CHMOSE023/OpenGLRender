@@ -277,7 +277,8 @@ unsigned Application::CreateTexture(const char* fileName)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// 翻转图像
-	stbi_set_flip_vertically_on_load(true);
+	// stbi_set_flip_vertically_on_load(true);
+	
 	// 加载并生成纹理
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load(fileName, &width, &height, &nrChannels, 0);
