@@ -6,22 +6,22 @@
 class Box :public Entity
 {
 private:    
-	GLuint programID;
-	GLuint VAO, VBO, EBO;
+	GLuint m_programID;
+	GLuint m_vao, m_vbo, m_ebo;
 public:
     Box()
     {
-        programID = -1;
-        VAO = -1;
-        VBO = -1;
-        EBO = -1;
+        m_programID = -1;
+        m_vao = -1;
+        m_vbo = -1;
+        m_ebo = -1;
     };
 	~Box()
     {
-        glDeleteVertexArrays(1, &VAO);
-        glDeleteBuffers(1, &VBO);
-        glDeleteBuffers(1, &EBO);      
-        glDeleteProgram(programID);
+        glDeleteVertexArrays(1, &m_vao);
+        glDeleteBuffers(1, &m_vbo);
+        glDeleteBuffers(1, &m_ebo);
+        glDeleteProgram(m_programID);
 
     };
 	void Init()
@@ -52,10 +52,10 @@ public:
         glShaderSource(fragmentShaderID, 1, &fragmentShaderSource, NULL);
         glCompileShader(fragmentShaderID);
 
-        programID = glCreateProgram();
-        glAttachShader(programID, vertexShaderID);
-        glAttachShader(programID, fragmentShaderID);
-        glLinkProgram(programID);
+        m_programID = glCreateProgram();
+        glAttachShader(m_programID, vertexShaderID);
+        glAttachShader(m_programID, fragmentShaderID);
+        glLinkProgram(m_programID);
 
         glDeleteShader(vertexShaderID);
         glDeleteShader(fragmentShaderID);
@@ -90,16 +90,16 @@ public:
         };
 
 
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
+        glGenVertexArrays(1, &m_vao);
+        glGenBuffers(1, &m_vbo);
+        glGenBuffers(1, &m_ebo);
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(m_vao);
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
@@ -121,20 +121,21 @@ public:
         //
         GLfloat currentTime = glfwGetTime();
         model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(-3.0, 0, 0));
         model = glm::rotate(model, glm::radians(50.0f) * currentTime, glm::vec3(0.5f, 1.0f, 0.0f));
 
         //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(programID);
+        glUseProgram(m_programID);
 
-        GLuint modelLoc = glGetUniformLocation(programID, "model");
-        GLuint viewLoc = glGetUniformLocation(programID, "view");
-        GLuint projectionLoc = glGetUniformLocation(programID, "projection");
+        GLuint modelLoc = glGetUniformLocation(m_programID, "model");
+        GLuint viewLoc = glGetUniformLocation(m_programID, "view");
+        GLuint projectionLoc = glGetUniformLocation(m_programID, "projection");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(m_vao);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glUseProgram(0);
