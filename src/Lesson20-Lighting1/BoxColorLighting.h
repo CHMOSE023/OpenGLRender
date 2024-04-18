@@ -107,13 +107,17 @@ public:
         glm::mat4 viewMat = camera.GetView();
         glm::mat4 modelMat = glm::mat4(1.0f);
 
+        // 灯光位置变化
+        lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
+        lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
+
         {  // 绘制物体 
 
             m_shaderLighting.Begin();
 
             modelMat = glm::rotate(modelMat, (float)glfwGetTime(), glm::vec3(1, 1, 0));
 
-            m_shaderLighting.SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
+            m_shaderLighting.SetVec3("objectColor", 0.0f, 0.5f, 0.31f);
             m_shaderLighting.SetVec3("lightColor",  1.0f, 1.0f, 1.0f);
             m_shaderLighting.SetVec3("lightPos",    lightPos);
             m_shaderLighting.SetVec3("viewPos",     camera.GetEye());  // 相机位置
