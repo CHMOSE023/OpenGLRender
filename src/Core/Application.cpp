@@ -129,7 +129,7 @@ void Application::WindowSizeCallback(GLFWwindow* window, int width, int height)
 // 滚轮旋转
 void Application::ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	Application* Application = GetWindow(window);
+	Application* app = GetWindow(window);
 	// ！！调整相机与目标点距离 m_camera-> m_radius
 	double    persent = 1;
 
@@ -142,8 +142,10 @@ void Application::ScrollCallback(GLFWwindow* window, double xoffset, double yoff
 		persent = 1.3;
 	}
 
-	Application->m_camera.SetEye(Application->m_camera.GetEye() * persent);	
-	Application->m_camera.Update();
+	//app->m_camera.SetEye(app->m_camera.GetEye() * persent);		
+	app->m_camera.ScaleCameraByPos(glm::vec3(0, 0, 0), persent); // 围绕原点缩放
+	app->m_camera.Update();
+
 }
 
 // 获取 glfw 窗口的用户数据，转换成 Application类指针。
