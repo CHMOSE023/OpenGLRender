@@ -9,8 +9,8 @@ class Ground :public Entity
 {
 public:
 	Ground() 
-	{
-		
+	{		
+		m_texture = -1;
 		m_vao = -1;
 		m_vbo = -1;			
 	};
