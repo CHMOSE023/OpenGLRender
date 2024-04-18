@@ -55,7 +55,7 @@ public:
 	}
 
 
-	virtual void Render(Camera &camera) // »æÖÆ
+	virtual void Render(const Camera &camera) // »æÖÆ
 	{
 		float ratio = camera.m_viewSize.z / (float)camera.m_viewSize.w;
 

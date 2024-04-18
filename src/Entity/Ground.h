@@ -72,8 +72,12 @@ public:
 
 	}
 
+	virtual void SetTexture( unsigned texture)
+	{
+		m_texture = texture;
+	}
 
-	virtual void Render(Camera &camera, unsigned texture) // 绘制
+	virtual void Render( const Camera &camera) // 绘制
 	{
 
 		glm::mat4  mvp;
@@ -84,7 +88,7 @@ public:
 		mvp = matProj * matView * matModel;
 		
 		m_shader.Begin();
-		glBindTexture(GL_TEXTURE_2D, texture);   // 使用纹理2
+		glBindTexture(GL_TEXTURE_2D, m_texture);   // 使用纹理2
 		glBindVertexArray(m_vao);
 		glUniformMatrix4fv(m_shader.m_mvp, 1, GL_FALSE, (const GLfloat*)&mvp);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -95,6 +99,7 @@ public:
 public:
 	unsigned        m_vao;
 	unsigned        m_vbo;
+	unsigned        m_texture;
 	Shader_P3_C4_T2 m_shader;
 
 };
