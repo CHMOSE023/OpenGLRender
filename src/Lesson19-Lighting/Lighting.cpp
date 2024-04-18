@@ -2,7 +2,7 @@
 #include "../Entity/Ground.h"
 #include "../Entity/Triangle.h"
 #include "iostream"
-#include "../Entity/Box.h"
+#include "../Entity/LightBox.h"
 
 #define APPLICTION "Lesson19-Lighting"
 
@@ -11,12 +11,13 @@ class LighingApp :public Application
 	// 1.准备数据
 	virtual void Startup() 
 	{		
-		m_textureCity = CreateTexture("textures/chongqing.jpg");
+		m_textureCity   = CreateTexture("textures/chongqing.jpg");
 		m_textureGround = CreateTexture("textures/ground.jpg");
 
 		m_triangle.Init();
 		m_ground.Init();
 		m_ground.SetTexture(m_textureGround);
+		m_lightBox.Init();
 
 	}
 
@@ -24,7 +25,8 @@ class LighingApp :public Application
 	virtual void Render()
 	{
 		m_ground.Render(m_camera);	
-		m_triangle.Render(m_camera);		
+		m_triangle.Render(m_camera);
+		m_lightBox.Render(m_camera);
 	}
 	
 	// 3.关闭
@@ -40,12 +42,7 @@ private: // 变量
 	// 模型类
 	Ground    m_ground;   // 地面
 	Triangle  m_triangle; // 三角形
-	Box       m_box;
-
-
-	unsigned        m_vao = 0;;
-	unsigned        m_vbo = 0;;
-	Shader_P3_C4_T2 m_shader;
+	LightBox  m_lightBox;
 
 	unsigned  m_textureCity   = 0;
 	unsigned  m_textureGround = 0;	
