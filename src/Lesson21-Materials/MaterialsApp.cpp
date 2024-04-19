@@ -2,9 +2,9 @@
 #include "../Entity/Ground.h"
 #include "../Entity/Triangle.h"
 #include "../Entity/Box.h"
-#include "iostream"
-#include "BoxMaterials.h"
-#include "ShaderCube.h"
+#include "../Entity/BoxMaterials.h"
+#include "../Shader/ShaderCube.h"
+#include <iostream>
 #include <vector>
 
 constexpr auto APPLICTION = "Lesson21-Materials";
