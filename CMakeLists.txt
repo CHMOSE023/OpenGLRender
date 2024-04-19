@@ -41,6 +41,7 @@ set( SRC_DIRES
      "Lesson19-Colors"       # 19-物体颜色  基础色 * 灯光
      "Lesson20-BasicLighting"# 20-基础光照 
      "Lesson21-Materials"    # 21-材质 
+     "Lesson22-LightingMaps" # 22-光照贴图
     
 )
 
