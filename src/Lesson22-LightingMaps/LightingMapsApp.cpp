@@ -8,8 +8,7 @@ class LightingMapsApp :public Application
 public:
 	LightingMapsApp() {};
 	~LightingMapsApp() {};
-
-	
+		
 	// 1.准备数据
 	virtual void Startup()
 	{
@@ -31,8 +30,7 @@ public:
 		for (Entity* obj:entities )
 		{
 			obj->Render(m_camera);
-		}
-		
+		}		
 	}
 	
 	// 3.关闭
@@ -56,7 +54,6 @@ private:
 	unsigned  m_textureGround = 0;
 
 };
-
 
 
 int main()
