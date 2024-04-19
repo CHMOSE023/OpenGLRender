@@ -1,4 +1,4 @@
-#pragma onec
+#pragma once
 #include "Entity.h"
 #include "glm/glm.hpp"
 #include "../Shader/Shader_P2_C3.h"

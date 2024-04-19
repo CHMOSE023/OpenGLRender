@@ -1,3 +1,4 @@
+#pragma once
 #include "../Entity/Entity.h"
 #include "../Core/Camera.h"
 #include "../Shader/ShaderBasicLighting.h"
