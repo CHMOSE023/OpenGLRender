@@ -40,6 +40,12 @@ public:
         auto cit = uniform.find(name);
         glUniform1f(cit->second, x);
     }
+
+    void SetInt(const std::string& name, const int d)const
+    {
+        auto cit = uniform.find(name);
+        glUniform1i(cit->second, d);        
+    }
 public:
 	int  m_shaderId;
 
