@@ -68,11 +68,13 @@ public:
 		 glVertexAttribPointer(m_shader.m_uv, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)28);
 		 glBindVertexArray(0);
 		 glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		
 		
 
 	}
 
-	virtual void SetTexture( unsigned texture)
+	virtual void SetTexture( unsigned &texture)
 	{
 		m_texture = texture;
 	}
@@ -88,7 +90,9 @@ public:
 		mvp = matProj * matView * matModel;
 		
 		m_shader.Begin();
-		glBindTexture(GL_TEXTURE_2D, m_texture);   // 使用纹理2
+		glActiveTexture(GL_TEXTURE0);              // 激活第一张纹理
+		glBindTexture(GL_TEXTURE_2D, m_texture);   // 使用纹理1
+		glUniform1i(m_shader.m_texture, 0);        // 纹理锚点
 		glBindVertexArray(m_vao);
 		glUniformMatrix4fv(m_shader.m_mvp, 1, GL_FALSE, (const GLfloat*)&mvp);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
