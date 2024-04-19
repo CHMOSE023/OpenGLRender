@@ -38,8 +38,8 @@ set( SRC_DIRES
      "Lesson16-Node"         # 16-场景节点
      "Lesson17-Terrain"      # 17-灰度图地形
      "Lesson18-Billboard"    # 18-布告板技术
-     "Lesson19-Lighting"     # 19-物体颜色  基础色 * 灯光
-     "Lesson20-Lighting1"    # 20-光照 
+     "Lesson19-Colors"       # 19-物体颜色  基础色 * 灯光
+     "Lesson20-BasicLighting"# 20-基础光照 
      "Lesson21-Materials"    # 21-材质 
     
 )
