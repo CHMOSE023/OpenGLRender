@@ -1,7 +1,7 @@
 #include "../Core/Application.h"
 #include "../Entity/Entity.h"
 #include "../Entity/Ground.h"
-#include "../Entity/BoxLightingCastersPoint.h"
+#include "../Entity/BoxLightingCastersSpotlightHard.h"
 #include <vector>
 
 class LightingMapsApp :public Application
@@ -26,17 +26,17 @@ public:
 		Ground* pGround = new Ground();
 		pGround->Init();
 		pGround->SetTexture(m_textureGround);
-		entities.push_back(pGround);
+		//entities.push_back(pGround);
 
-		BoxLightingCastersPoint* pBoxLightingCastersPoint = new BoxLightingCastersPoint;
+		BoxLightingCastersSpotlightHard* pboxLightingCastersSpotlightHard = new BoxLightingCastersSpotlightHard;
 
 		// 创建纹理材质
-		pBoxLightingCastersPoint->m_diffuseMap = m_diffuseMap;
-		pBoxLightingCastersPoint->m_specularMap = m_specularMap;
+		pboxLightingCastersSpotlightHard->m_diffuseMap = m_diffuseMap;
+		pboxLightingCastersSpotlightHard->m_specularMap = m_specularMap;
 
-		pBoxLightingCastersPoint->Init();
+		pboxLightingCastersSpotlightHard->Init();
 
-		entities.push_back(pBoxLightingCastersPoint);
+		entities.push_back(pboxLightingCastersSpotlightHard);
 	}
 
 	// 2.渲染数据
