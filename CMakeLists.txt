@@ -42,6 +42,7 @@ set( SRC_DIRES
      "Lesson20-BasicLighting"# 20-基础光照 
      "Lesson21-Materials"    # 21-材质 
      "Lesson22-LightingMaps" # 22-光照贴图
+     "Lesson23-LightCasters" # 23-光源类型 定向光 、 点光源 、聚光灯
     
 )
 
