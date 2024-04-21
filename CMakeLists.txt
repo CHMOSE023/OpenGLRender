@@ -14,35 +14,36 @@ add_compile_definitions(
 )
 
 # src内的文件夹
-set( SRC_DIRES
-	 "Test01-Ray"            # 射线
-	 "Test02-Buffer"         # 缓冲区
-	 "Test03-Nuklear"        # NuklearUI
-	 "Test04-VAO"            # 测试 VAO VBO EBO
-	 "Test05-Camera"         # 测试 Camera 旋转平移 
-	 "Lesson01-GLFW"         # 01-使用 glfw 建立OpenGL窗口
-	 "Lesson02-App"          # 02-封装窗口
-     "Lesson03-Texture2D"    # 03-使用2D纹理
-     "Lesson04-MVP"          # 04-矩阵：模型M、观察V、投影P 
-     "Lesson05-Camera"       # 05-摄像机 第一人称 
-     "Lesson06-Camera3rd"    # 06-摄像机 第三人称 
-     "Lesson07-VertexBuffer" # 07-顶点缓冲区 
-     "Lesson08-FrameBuffer"  # 08-帧缓冲 
-     "Lesson09-Alphablend"   # 09-混合
-     "Lesson10-Model"        # 10-外部模型
-     "Lesson11-Animation2D"  # 11-动画基于图片
-     "Lesson12-Animation3D"  # 12-动画基于关键帧
-     "Lesson13-SkinBase"     # 13-骨骼动画节点原理
-     "Lesson14-SkinModel"    # 14-播放模型中骨骼动画
-     "Lesson15-Culling"      # 15-渲染视锥体内模型
-     "Lesson16-Node"         # 16-场景节点
-     "Lesson17-Terrain"      # 17-灰度图地形
-     "Lesson18-Billboard"    # 18-布告板技术
-     "Lesson19-Colors"       # 19-物体颜色  基础色 * 灯光
-     "Lesson20-BasicLighting"# 20-基础光照 
-     "Lesson21-Materials"    # 21-材质 
-     "Lesson22-LightingMaps" # 22-光照贴图
-     "Lesson23-LightCasters" # 23-光源类型 定向光 、 点光源 、聚光灯
+set( SRC_DIRES                  
+	 "Test01-Ray"               # 射线
+	 "Test02-Buffer"            # 缓冲区
+	 "Test03-Nuklear"           # NuklearUI
+	 "Test04-VAO"               # 测试 VAO VBO EBO
+	 "Test05-Camera"            # 测试 Camera 旋转平移 
+	 "Lesson01-GLFW"            # 01-使用 glfw 建立OpenGL窗口
+	 "Lesson02-App"             # 02-封装窗口
+     "Lesson03-Texture2D"       # 03-使用2D纹理
+     "Lesson04-MVP"             # 04-矩阵：模型M、观察V、投影P 
+     "Lesson05-Camera"          # 05-摄像机 第一人称 
+     "Lesson06-Camera3rd"       # 06-摄像机 第三人称 
+     "Lesson07-VertexBuffer"    # 07-顶点缓冲区 
+     "Lesson08-FrameBuffer"     # 08-帧缓冲 
+     "Lesson09-Alphablend"      # 09-混合
+     "Lesson10-Model"           # 10-外部模型
+     "Lesson11-Animation2D"     # 11-动画基于图片
+     "Lesson12-Animation3D"     # 12-动画基于关键帧
+     "Lesson13-SkinBase"        # 13-骨骼动画节点原理
+     "Lesson14-SkinModel"       # 14-播放模型中骨骼动画
+     "Lesson15-Culling"         # 15-渲染视锥体内模型
+     "Lesson16-Node"            # 16-场景节点
+     "Lesson17-Terrain"         # 17-灰度图地形
+     "Lesson18-Billboard"       # 18-布告板技术
+     "Lesson19-Colors"          # 19-物体颜色  基础色 * 灯光
+     "Lesson20-BasicLighting"   # 20-基础光照 
+     "Lesson21-Materials"       # 21-材质 
+     "Lesson22-LightingMaps"    # 22-光照贴图
+     "Lesson23-LightCasters"    # 23-光源类型 定向光 、 点光源 、聚光灯
+     "Lesson24-LightsMultiple"  # 24-多光源
     
 )
 
