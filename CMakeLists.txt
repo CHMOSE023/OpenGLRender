@@ -44,6 +44,7 @@ set( SRC_DIRES
      "Lesson22-LightingMaps"    # 22-光照贴图
      "Lesson23-LightCasters"    # 23-光源类型 定向光 、 点光源 、聚光灯
      "Lesson24-LightsMultiple"  # 24-多光源
+     "Lesson25-DepthTesting"    # 25-深度测试
     
 )
 
